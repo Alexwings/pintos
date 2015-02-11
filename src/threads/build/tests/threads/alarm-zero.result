@@ -1,0 +1,5 @@
+FAIL
+Kernel panic in run: PANIC at ../../lib/kernel/list.c:84 in list_next(): assertion `is_head (elem) || is_interior (elem)' failed.
+Call stack: 0xc002846e
+Translation of call stack:
+0xc002846e: debug_panic (.../../lib/kernel/debug.c:38)
