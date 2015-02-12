@@ -1,4 +1,3 @@
-p
 #ifndef THREADS_SYNCH_H
 #define THREADS_SYNCH_H
 
