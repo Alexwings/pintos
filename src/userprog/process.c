@@ -18,8 +18,13 @@
 #include "threads/thread.h"
 #include "threads/vaddr.h"
 
+#include "userprog/syscall.h"
+
+#define WORD 4
+
 static thread_func start_process NO_RETURN;
-static bool load (const char *cmdline, void (**eip) (void), void **esp);
+static bool load (const char *cmdline, void (**eip) (void), void **esp, char **cur_ptr);
+
 
 /* Starts a new thread running a user program loaded from
    FILENAME.  The new thread may be scheduled (and may even exit)
@@ -38,6 +43,10 @@ process_execute (const char *file_name)
     return TID_ERROR;
   strlcpy (fn_copy, file_name, PGSIZE);
 
+  /* Get the real file name */
+  char *cur_ptr;
+  file_name = strtok_r((char *)file_name, " ", &cur_ptr);
+
   /* Create a new thread to execute FILE_NAME. */
   tid = thread_create (file_name, PRI_DEFAULT, start_process, fn_copy);
   if (tid == TID_ERROR)
@@ -54,12 +63,16 @@ start_process (void *file_name_)
   struct intr_frame if_;
   bool success;
 
+  /* get the real file name*/
+  char* cur_ptr;
+  file_name = strtok_r(file_name, " ", &cur_ptr); 
+
   /* Initialize interrupt frame and load executable. */
   memset (&if_, 0, sizeof if_);
   if_.gs = if_.fs = if_.es = if_.ds = if_.ss = SEL_UDSEG;
   if_.cs = SEL_UCSEG;
   if_.eflags = FLAG_IF | FLAG_MBS;
-  success = load (file_name, &if_.eip, &if_.esp);
+  success = load (file_name, &if_.eip, &if_.esp, &cur_ptr);
 
   /* If load failed, quit. */
   palloc_free_page (file_name);
@@ -195,7 +208,7 @@ struct Elf32_Phdr
 #define PF_W 2          /* Writable. */
 #define PF_R 4          /* Readable. */
 
-static bool setup_stack (void **esp);
+static bool setup_stack (void **esp, char *, char **);
 static bool validate_segment (const struct Elf32_Phdr *, struct file *);
 static bool load_segment (struct file *file, off_t ofs, uint8_t *upage,
                           uint32_t read_bytes, uint32_t zero_bytes,
@@ -206,7 +219,8 @@ static bool load_segment (struct file *file, off_t ofs, uint8_t *upage,
    and its initial stack pointer into *ESP.
    Returns true if successful, false otherwise. */
 bool
-load (const char *file_name, void (**eip) (void), void **esp) 
+load (const char *file_name, void (**eip) (void), void **esp, 
+      char** cur_ptr) 
 {
   struct thread *t = thread_current ();
   struct Elf32_Ehdr ehdr;
@@ -302,7 +316,7 @@ load (const char *file_name, void (**eip) (void), void **esp)
     }
 
   /* Set up stack. */
-  if (!setup_stack (esp))
+  if (!setup_stack (esp, (char *)file_name, cur_ptr))
     goto done;
 
   /* Start address. */
@@ -427,7 +441,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 /* Create a minimal stack by mapping a zeroed page at the top of
    user virtual memory. */
 static bool
-setup_stack (void **esp) 
+setup_stack (void **esp, char *file_name, char** cur_ptr) 
 {
   uint8_t *kpage;
   bool success = false;
@@ -439,8 +453,59 @@ setup_stack (void **esp)
       if (success)
         *esp = PHYS_BASE;
       else
+      {	
         palloc_free_page (kpage);
+        return success;
+      }
     }
+
+  char *token;
+  int argv_size  = 3;
+  char **argv = malloc (argv_size * sizeof(char *));
+  int  argc = 0;
+
+  
+  for(token = (char *) file_name; token != NULL; 
+      token = strtok_r(NULL, " ",  cur_ptr))
+  {
+    int len = strlen (token) + 1;
+    *esp -= len;
+    argv[argc] = *esp;
+    argc ++;  
+    if (argc >= argv_size)
+    {
+      argv_size *= 2;
+      argv = realloc (argv, argv_size *sizeof(char *)); 
+    }
+    memcpy (*esp, token, len); 
+  }  
+  argv[argc] = 0;
+  int rem = (size_t)(*esp) % WORD;
+  
+  if (rem)
+  {  
+    *esp -=  rem;
+    memcpy (*esp, &argv[argc], rem); 
+  }
+
+  int i;
+  for (i = argc; i>= 0; i++)
+  {
+    *esp = *esp - WORD;
+    memcpy (*esp, &argv[i], WORD);
+  }
+
+  token = *esp;
+  *esp -= WORD;
+  memcpy (*esp, &token, WORD);
+  *esp -= WORD;
+  memcpy (*esp, &argc, WORD);
+  *esp -= WORD;
+  memcpy (*esp, &argv[argc], WORD);
+  
+/* finally free the record of addess */
+  free(argv);
+
   return success;
 }
 
@@ -457,6 +522,8 @@ static bool
 install_page (void *upage, void *kpage, bool writable)
 {
   struct thread *t = thread_current ();
+
+
 
   /* Verify that there's not already a page at that virtual
      address, then map our page there. */
