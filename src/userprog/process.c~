@@ -226,8 +226,8 @@ static bool load_segment (struct file *file, off_t ofs, uint8_t *upage,
    and its initial stack pointer into *ESP.
    Returns true if successful, false otherwise. */
 bool
-load (const char *file_name, void (**eip) (void), void **esp, 
-      char** cur_ptr) 
+load (const char *file_name, void (**eip) (void), void **esp,
+      char **save_ptr) 
 {
   struct thread *t = thread_current ();
   struct Elf32_Ehdr ehdr;
@@ -323,9 +323,9 @@ load (const char *file_name, void (**eip) (void), void **esp,
     }
 
   /* Set up stack. */
-  if (!setup_stack (esp, (char *)file_name, cur_ptr))
+  if (!setup_stack (esp, file_name, save_ptr))
     goto done;
-
+    
   /* Start address. */
   *eip = (void (*) (void)) ehdr.e_entry;
 
