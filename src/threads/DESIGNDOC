@@ -28,6 +28,7 @@ Xinyuan Wang <alexwang@ccs.neu.edu>
 >> member, global or static variable, `typedef', or enumeration.
 >> Identify the purpose of each in 25 words or less.
 
+<<<<<<< HEAD
 ANSWER:
 
 /* Added a new field ticks in structure thread in thread.h*/
@@ -46,12 +47,28 @@ The field ticks is a 64-bit integer that records the time when this thread shoul
 static struct list sleep_list;
 
 sleep_list is a list which contains all the threads that were put to state THREAD_BLOCKED by timer_sleep(). The list is always sorted by ticks, which is the time when this thread should wake up.
+=======
+Add a new list in timer.c:
+A sleep_list is a list in which contains all the threads that are sleeping 
+and waiting for being awake. The list is in order of ticks
+
+/* a list take record threads in sleep */
+static struct list sleep_list;
+
+Added to struct thread:
+A ticks is a 64bit integer that record the time when this thread should be
+wake up.
+
+/* the ticks when this thread should wake up*/
+int64_t ticks;
+>>>>>>> 568ffa66dcd677696ed123b5259936c2ed07a450
 
 ---- ALGORITHMS ----
 
 >> A2: Briefly describe what happens in a call to timer_sleep(),
 >> including the effects of the timer interrupt handler.
 
+<<<<<<< HEAD
 ANSWER:
 
 In a call to timer_sleep(): 
@@ -62,36 +79,71 @@ Besides, the interrupt is disabled during these operations.
 In the timer interrupt handler:
 (1) It calls awake_sleepers(), which wakes up all the threads in sleep_list whose field ticks has already come. The function removes these threads from sleep_list and puts them into ready_list in order of priority. 
 (2) Then it calls thread_tick(), which then may call intr_yield_on_return() to check if the current thread needs to yield.
+=======
+In a call to timer_sleep(): 
+(1) If the input is no bigger than 0, the program will return.
+(2) Else the current running thread will be blocked and push into sleep_list
+and record its wake up time.
+The timer interrupt handler calls awake_sleepers() to wake the sleeping threads up.
+>>>>>>> 568ffa66dcd677696ed123b5259936c2ed07a450
 
 >> A3: What steps are taken to minimize the amount of time spent in
 >> the timer interrupt handler?
 
+<<<<<<< HEAD
 (1) In timer_sleep(), a thread is pushed into sleep_list in increasing order of its field ticks.
 
 (2) In the timer interrupt handler, sleep_list is already sorted by field ticks of each thread, so that the loop will break once it meets the first thread in the list whose field ticks is greater than the current timer ticks. Therefore, the new ways of implementation saves the trouble of traversing the whole list and thus saves time.
 
+=======
+(1) In the timer_sleep(),when the sleeping threads are pushed into sleep_list, 
+they are placed in increasing order of their variable: ticks.
+(2) When the interrupt handler check each threads' awake time in sleep_list, 
+it will continue check the next one only if this thread can be wake up. Once 
+it finds a thread whose ticks is bigger than current time. it will stop 
+checking the next one and jump out of the loop. So there is no need to look  
+through the whole list. That minimize the amount of time.
+>>>>>>> 568ffa66dcd677696ed123b5259936c2ed07a450
 ---- SYNCHRONIZATION ----
 
 >> A4: How are race conditions avoided when multiple threads call
 >> timer_sleep() simultaneously?
 
+<<<<<<< HEAD
 When a thread calls timer_sleep(), the interrupt will be disabled, so no other threads can call timer_sleep() simultaneously.
+=======
+When a thread calls timer_sleep(), the interrupt will be disabled, so no other
+threads can call timer_sleep() simultaneously.
+>>>>>>> 568ffa66dcd677696ed123b5259936c2ed07a450
 
 >> A5: How are race conditions avoided when a timer interrupt occurs
 >> during a call to timer_sleep()?
 
+<<<<<<< HEAD
 During a call to timer_sleep(), all the interrupt will be disabled, so it prevents a timer interrupt from occurring in the first place.
+=======
+During a call to timer_sleep(), all the interrupt will be diabled, so it avoid
+a timer interrupt occurs in the first place.
+>>>>>>> 568ffa66dcd677696ed123b5259936c2ed07a450
 
 ---- RATIONALE ----
 
 >> A6: Why did you choose this design?  In what ways is it superior to
 >> another design you considered?
 
+<<<<<<< HEAD
 
 We considered the design in the slides and then came up with this final design. We evaluated and compared both designs and decided that our final design is superior in the following ways:
 (1) Less changes. For one thing, We don't need to add an extra thread state THREAD_SLEEPING, as the design in the slides did. For another, changes in function schedule() may affect the behaviour of other functions that call schedule(). Therefore final design did not change function schedule().
 (2) More effeciency. The final design minimizes the time spent in the timer interrupt handler by maintaining a sleep_list sorted by ticks.
 
+=======
+We considered the design in the slides, but this design is better than the
+design in the slides in two ways:
+(1) Less changes. We don't need to add extra status in the threads status.
+(2) More effecient. The ordered sleeping list minimize the searching time in 
+awake_sleepers, so it can be more effecient.
+>>>>>>> 568ffa66dcd677696ed123b5259936c2ed07a450
  
 			 PRIORITY SCHEDULING
 			 ===================
@@ -102,17 +154,29 @@ We considered the design in the slides and then came up with this final design. 
 >> `struct' member, global or static variable, `typedef', or
 >> enumeration.  Identify the purpose of each in 25 words or less.
 
+<<<<<<< HEAD
 ANSWER:
 
 /******* New and changed fields in structure thread in thread.h *******/
 
 /* Initial thread priority before priority donation*/
  int init_priority;                  
+=======
+Added to struct thread:
+init_priority is used to record the real priority of this thread,
+the given priority is used to record the priority after donation.
+
+ int init_priority;                  /* Original priority*/
+
+ /* this is the element for donation list*/
+ struct list_elem wait_elem;
+>>>>>>> 568ffa66dcd677696ed123b5259936c2ed07a450
 
  /* The list of all threads that are blocked by this thread,
     because this thread holds some resources they need */
  struct list wait_list;
 
+<<<<<<< HEAD
  /* this is the element for donation list */
  struct list_elem wait_elem;
 
@@ -140,16 +204,41 @@ ANSWER:
   In B wait_list, there is one thread A
   In A wait_list, there are no thread to donate
 
+=======
+ /* this one record a locker for which this thread is waitting*/
+ struct lock *lock_to_wait;
+
+>> B2: Explain the data structure used to track priority donation.
+>> Use ASCII art to diagram a nested donation.  (Alternately, submit a
+>> .png file.)
+		   (struct thread)
+		+---donation list----+
+		|    donor threads'  |
+		|    wait_elem       |
+		|                    |
+		| (In the order of   |
+		|  priority decrease)|
+		|                    |
+		+--------------------+
+>>>>>>> 568ffa66dcd677696ed123b5259936c2ed07a450
 ---- ALGORITHMS ----
 
 >> B3: How do you ensure that the highest priority thread waiting for
 >> a lock, semaphore, or condition variable wakes up first?
 
+<<<<<<< HEAD
 When pushing a thread into the wait_list of a lock, semaphore or condition, we make sure that this thread will be inserted into the right place according to its priority. Therefore we can maintain the wait_list that is sorted by priority. Therefore, the thread of highest priority will always be the first element in the list and thus be first waken up.
+=======
+When inserting a thread to the wait_list of a lock, semaphore or condition,
+this thread will be inserted in the right place that make the list in 
+decreasing order of each thread's priority. In that way, it ensures that the
+highest prority thread wakes up first.
+>>>>>>> 568ffa66dcd677696ed123b5259936c2ed07a450
 
 >> B4: Describe the sequence of events when a call to lock_acquire()
 >> causes a priority donation.  How is nested donation handled?
 
+<<<<<<< HEAD
   If this thread can't get the lock
   (1) current thread would record this lock in lock-to-wait  
   (2) Insert current to the donation list of lock-holder
@@ -164,6 +253,10 @@ When pushing a thread into the wait_list of a lock, semaphore or condition, we m
 
    When current get the lock, set current thread as lock holder, then reset
    current thread's lock to wait
+=======
+(1) Add the thread to lock holder's donation list.
+(2) Check the thread's priority to  adjust the holder's priority.
+>>>>>>> 568ffa66dcd677696ed123b5259936c2ed07a450
 
 To handle the nested donation, we set up a loop to donate current thread's
 to its holder and its holder's holder, etc. When the depth of nested donation
@@ -172,6 +265,7 @@ is deeper than MAX_DEPTH, it will stop the loop.
 >> B5: Describe the sequence of events when lock_release() is called
 >> on a lock that a higher-priority thread is waiting for.
 
+<<<<<<< HEAD
 (1) The thread check it's donation list and remove all threads that wait for 
     the lock 
 (2) Recalculate the priority of current thread, as the previous doantor with 
@@ -179,18 +273,28 @@ is deeper than MAX_DEPTH, it will stop the loop.
 (3) If any threads in ready list get higher priority than current thread,
     preempt the current thread. 
 
+=======
+(1) The thread check it's donation list and remove all the donater who 
+require this lock.
+(2) The higher thread who requrie this lock holds the lock.
+>>>>>>> 568ffa66dcd677696ed123b5259936c2ed07a450
 ---- SYNCHRONIZATION ----
 
 >> B6: Describe a potential race in thread_set_priority() and explain
 >> how your implementation avoids it.  Can you use a lock to avoid
 >> this race?
 
+<<<<<<< HEAD
 The thread_set_priority() function pass the variable "priority" value to
 current thread. If interrupt happens, Interrupt handler might preempt the 
 running thread or change the value of variable. Then we get wrong input.
 
 Interrupt handlers could not occupy resource, so I can't use a lock to avoid 
 this race.
+=======
+When runing thread_set_priority(), if there comes a intrrupt that block the 
+priority setting process, this thread could be given another priority.
+>>>>>>> 568ffa66dcd677696ed123b5259936c2ed07a450
 
 The way to avoid it is to disable the interrupt when running the 
 thread_set_priority().
@@ -199,11 +303,18 @@ thread_set_priority().
 >> B7: Why did you choose this design?  In what ways is it superior to
 >> another design you considered?
 
+<<<<<<< HEAD
 We choose this design is because this design is efficient. Since all elements are
 sorted in lock_waiter and ready_list, the runtime of lock_release and schedule is 
 pretty low.
 
 
+=======
+We choose this design is because this design is effecient. Just pop
+the first element in the waiting list, this thread has the highest priority.
+This is because the waiting list is sorted when the threads are inserted. In
+this way it saves the time for searching for the highest priority thread. 
+>>>>>>> 568ffa66dcd677696ed123b5259936c2ed07a450
 			   SURVEY QUESTIONS
 			   ================
 
