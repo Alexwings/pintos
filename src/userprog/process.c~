@@ -20,16 +20,17 @@
 
 #include "userprog/syscall.h"
 
-#define WORD 4
 
 static thread_func start_process NO_RETURN;
-static bool load (const char *cmdline, void (**eip) (void), void **esp, char **cur_ptr);
+static bool load (const char *cmdline, void (**eip) (void), void **esp,
+		  char** save_ptr);
 
 
 /* Starts a new thread running a user program loaded from
    FILENAME.  The new thread may be scheduled (and may even exit)
    before process_execute() returns.  Returns the new process's
-   thread id, or TID_ERROR if the thread cannot be created. */
+   thread id, or TID_ERROR if the thread cannot be created. 
+ */
 tid_t
 process_execute (const char *file_name) 
 {
@@ -43,16 +44,17 @@ process_execute (const char *file_name)
     return TID_ERROR;
   strlcpy (fn_copy, file_name, PGSIZE);
 
-  /* Get the real file name */
-  char *cur_ptr;
-  file_name = strtok_r((char *)file_name, " ", &cur_ptr);
+  // Get parsed file name
+  char *save_ptr;
+  file_name = strtok_r((char *) file_name, " ", &save_ptr);
 
   /* Create a new thread to execute FILE_NAME. */
   tid = thread_create (file_name, PRI_DEFAULT, start_process, fn_copy);
   if (tid == TID_ERROR)
-    palloc_free_page (fn_copy); 
+    palloc_free_page (fn_copy);
   return tid;
 }
+
 
 /* A thread function that loads a user process and starts it
    running. */
@@ -63,16 +65,16 @@ start_process (void *file_name_)
   struct intr_frame if_;
   bool success;
 
-  /* get the real file name*/
-  char* cur_ptr;
-  file_name = strtok_r(file_name, " ", &cur_ptr); 
+  // Get actual file name (first parsed token)
+  char *save_ptr;
+  file_name = strtok_r(file_name, " ", &save_ptr);
 
   /* Initialize interrupt frame and load executable. */
   memset (&if_, 0, sizeof if_);
   if_.gs = if_.fs = if_.es = if_.ds = if_.ss = SEL_UDSEG;
   if_.cs = SEL_UCSEG;
   if_.eflags = FLAG_IF | FLAG_MBS;
-  success = load (file_name, &if_.eip, &if_.esp, &cur_ptr);
+  success = load (file_name, &if_.eip, &if_.esp, &save_ptr);
 
   /* If load failed, quit. */
   palloc_free_page (file_name);
@@ -207,6 +209,11 @@ struct Elf32_Phdr
 #define PF_X 1          /* Executable. */
 #define PF_W 2          /* Writable. */
 #define PF_R 4          /* Readable. */
+
+// Used for setup_stack
+#define WORD_SIZE 4
+#define DEFAULT_ARGV 2
+
 
 static bool setup_stack (void **esp, char *, char **);
 static bool validate_segment (const struct Elf32_Phdr *, struct file *);
@@ -441,7 +448,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 /* Create a minimal stack by mapping a zeroed page at the top of
    user virtual memory. */
 static bool
-setup_stack (void **esp, char *file_name, char** cur_ptr) 
+setup_stack (void **esp, const char* file_name, char** save_ptr) 
 {
   uint8_t *kpage;
   bool success = false;
@@ -453,57 +460,56 @@ setup_stack (void **esp, char *file_name, char** cur_ptr)
       if (success)
         *esp = PHYS_BASE;
       else
-      {	
-        palloc_free_page (kpage);
-        return success;
-      }
+	{
+	  palloc_free_page (kpage);
+	  return success;
+	}
     }
 
   char *token;
-  int argv_size  = 3;
-  char **argv = malloc (argv_size * sizeof(char *));
-  int  argc = 0;
+  char **argv = malloc(DEFAULT_ARGV*sizeof(char *));
+  int i, argc = 0, argv_size = DEFAULT_ARGV;
 
-  
-  for(token = (char *) file_name; token != NULL; 
-      token = strtok_r(NULL, " ",  cur_ptr))
-  {
-    int len = strlen (token) + 1;
-    *esp -= len;
-    argv[argc] = *esp;
-    argc ++;  
-    if (argc >= argv_size)
+  // Push args onto stack
+  for (token = (char *) file_name; token != NULL;
+       token = strtok_r (NULL, " ", save_ptr))
     {
-      argv *= 2;
-      argv = realloc (argv, argv_size *sizeof(char *)); 
+      *esp -= strlen(token) + 1;
+      argv[argc] = *esp;
+      argc++;
+      // Resize argv
+      if (argc >= argv_size)
+	{
+	  argv_size *= 2;
+	  argv = realloc(argv, argv_size*sizeof(char *));
+	}
+      memcpy(*esp, token, strlen(token) + 1);
     }
-    memcpy (*esp, token, len); 
-  }  
   argv[argc] = 0;
-  int rem = (size_t)(*esp) % WORD;
-  
-  if (rem)
-  {  
-    *esp -=  rem;
-    memcpy (*esp, &argv[argc], rem); 
-  }
-
-  int i;
-  for (i = argc; i>= 0; i++)
-  {
-    *esp = *esp - WORD;
-    memcpy (*esp, &argv[i], WORD);
-  }
-
+  // Align to word size (4 bytes)
+  i = (size_t) *esp % WORD_SIZE;
+  if (i)
+    {
+      *esp -= i;
+      memcpy(*esp, &argv[argc], i);
+    }
+  // Push argv[i] for all i
+  for (i = argc; i >= 0; i--)
+    {
+      *esp -= sizeof(char *);
+      memcpy(*esp, &argv[i], sizeof(char *));
+    }
+  // Push argv
   token = *esp;
-  *esp -= WORD;
-  memcpy (*esp, &token, WORD);
-  *esp -= WORD;
-  memcpy (*esp, &argc, WORD);
-  *esp -= WORD;
-  memcpy (*esp, &argv[argc], WORD);
-  
-/* finally free the record of addess */
+  *esp -= sizeof(char **);
+  memcpy(*esp, &token, sizeof(char **));
+  // Push argc
+  *esp -= sizeof(int);
+  memcpy(*esp, &argc, sizeof(int));
+  // Push fake return addr
+  *esp -= sizeof(void *);
+  memcpy(*esp, &argv[argc], sizeof(void *));
+  // Free argv
   free(argv);
 
   return success;
