@@ -1,0 +1,7 @@
+FAIL
+Kernel panic in run: PANIC at ../../threads/malloc.c:274 in block_to_arena(): assertion `a->magic == ARENA_MAGIC' failed.
+Call stack: 0xc0028bae 0x6c62642d
+Translation of call stack:
+In kernel.o:
+0xc0028bae: debug_panic (.../../lib/kernel/debug.c:38)
+0x6c62642d: (unknown)

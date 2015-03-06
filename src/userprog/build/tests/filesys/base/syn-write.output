@@ -1,0 +1,36 @@
+Copying tests/filesys/base/syn-write to scratch partition...
+Copying tests/filesys/base/child-syn-wrt to scratch partition...
+qemu -hda /tmp/13GegCLANV.dsk -m 4 -net none -nographic -monitor null
+PiLo hda1
+Loading...........
+Kernel command line: -q -f extract run syn-write
+Pintos booting with 4,088 kB RAM...
+382 pages available in kernel pool.
+382 pages available in user pool.
+Calibrating timer...  it should run before loopthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluit should run after loop!157,081,600 loops/s.
+hda: 5,040 sectors (2 MB), model "QM00001", serial "QEMU HARDDISK"
+hda1: 184 sectors (92 kB), Pintos OS kernel (20)
+hda2: 4,096 sectors (2 MB), Pintos file system (21)
+hda3: 199 sectors (99 kB), Pintos scratch (22)
+filesys: using hda2
+scratch: using hda3
+Formatting file system...done.
+Boot complete.
+Extracting ustar archive from scratch device into file system...
+Putting 'syn-write' into the file system...
+Putting 'child-syn-wrt' into the file system...
+Erasing ustar archive...
+Executing 'syn-write':
+Kernel PANIC at ../../userprog/process.c:113 in process_wait(): assertion `cp->return_status == -1' failed.
+Call stack: 0xc0028bce.
+The `backtrace' program can make call stacks useful.
+Read "Backtraces" in the "Debugging Tools" chapter
+of the Pintos documentation for more information.
+Timer: 72 ticks
+Thread: 41 idle ticks, 31 kernel ticks, 0 user ticks
+hda2 (filesys): 51 reads, 404 writes
+hda3 (scratch): 198 reads, 2 writes
+Console: 1352 characters output
+Keyboard: 0 keys pressed
+Exception: 0 page faults
+Powering off...

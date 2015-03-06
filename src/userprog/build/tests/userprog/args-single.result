@@ -1,2 +1,2 @@
 FAIL
-Run didn't produce any output
+run: TIMEOUT after 60 seconds of host CPU time

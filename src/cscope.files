@@ -29,12 +29,12 @@ userprog/gdt.c
 userprog/gdt.h
 userprog/pagedir.c
 userprog/pagedir.h
-userprog/process.c
 userprog/process.h
 userprog/syscall.c
 userprog/syscall.h
 userprog/tss.c
 userprog/tss.h
+userprog/process.c
 filesys/directory.c
 filesys/directory.h
 filesys/file.c
