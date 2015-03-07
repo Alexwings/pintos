@@ -1,12 +1,12 @@
 Copying tests/filesys/base/sm-seq-block to scratch partition...
-qemu -hda /tmp/DOyuOICWOv.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/7ojvGLdze4.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run sm-seq-block
 Pintos booting with 4,088 kB RAM...
 382 pages available in kernel pool.
 382 pages available in user pool.
-Calibrating timer...  it should run before loopthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluit should run after loop!130,867,200 loops/s.
+Calibrating timer...  it should run before loopthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluit should run after loop!157,081,600 loops/s.
 hda: 5,040 sectors (2 MB), model "QM00001", serial "QEMU HARDDISK"
 hda1: 184 sectors (92 kB), Pintos OS kernel (20)
 hda2: 4,096 sectors (2 MB), Pintos file system (21)
@@ -19,16 +19,22 @@ Extracting ustar archive from scratch device into file system...
 Putting 'sm-seq-block' into the file system...
 Erasing ustar archive...
 Executing 'sm-seq-block':
-Kernel PANIC at ../../userprog/process.c:113 in process_wait(): assertion `cp->return_status == -1' failed.
-Call stack: 0xc0028bce.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 65 ticks
-Thread: 38 idle ticks, 27 kernel ticks, 0 user ticks
-hda2 (filesys): 26 reads, 194 writes
+(sm-seq-block) begin
+(sm-seq-block) create "noodle"
+(sm-seq-block) open "noodle"
+(sm-seq-block) writing "noodle"
+(sm-seq-block) close "noodle"
+(sm-seq-block) open "noodle" for verification
+(sm-seq-block) verified contents of "noodle"
+(sm-seq-block) close "noodle"
+(sm-seq-block) end
+sm-seq-block: exit(0)
+Execution of 'sm-seq-block' complete.
+Timer: 569 ticks
+Thread: 33 idle ticks, 536 kernel ticks, 0 user ticks
+hda2 (filesys): 127 reads, 233 writes
 hda3 (scratch): 94 reads, 2 writes
-Console: 1311 characters output
+Console: 1371 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

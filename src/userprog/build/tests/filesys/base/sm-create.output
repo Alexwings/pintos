@@ -1,5 +1,5 @@
 Copying tests/filesys/base/sm-create to scratch partition...
-qemu -hda /tmp/d4zQxx__f9.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/2RJgyDBAqM.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run sm-create
@@ -19,16 +19,19 @@ Extracting ustar archive from scratch device into file system...
 Putting 'sm-create' into the file system...
 Erasing ustar archive...
 Executing 'sm-create':
-Kernel PANIC at ../../userprog/process.c:113 in process_wait(): assertion `cp->return_status == -1' failed.
-Call stack: 0xc0028bce.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 64 ticks
-Thread: 34 idle ticks, 30 kernel ticks, 0 user ticks
-hda2 (filesys): 26 reads, 194 writes
+(sm-create) begin
+(sm-create) create "blargle"
+(sm-create) open "blargle" for verification
+(sm-create) verified contents of "blargle"
+(sm-create) close "blargle"
+(sm-create) end
+sm-create: exit(0)
+Execution of 'sm-create' complete.
+Timer: 389 ticks
+Thread: 34 idle ticks, 355 kernel ticks, 0 user ticks
+hda2 (filesys): 101 reads, 210 writes
 hda3 (scratch): 94 reads, 2 writes
-Console: 1302 characters output
+Console: 1251 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

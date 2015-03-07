@@ -1,11 +1,11 @@
-qemu -hda /tmp/Bn2rVvbfQB.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/yWBU5Zu3P5.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading..........
 Kernel command line: -q run priority-change
 Pintos booting with 4,088 kB RAM...
 382 pages available in kernel pool.
 382 pages available in user pool.
-Calibrating timer...  it should run before loopthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluit should run after loop!104,755,200 loops/s.
+Calibrating timer...  it should run before loopthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluit should run after loop!157,081,600 loops/s.
 Boot complete.
 Executing 'priority-change':
 (priority-change) begin
@@ -18,6 +18,6 @@ Executing 'priority-change':
 Execution of 'priority-change' complete.
 Timer: 24 ticks
 Thread: 0 idle ticks, 24 kernel ticks, 0 user ticks
-Console: 852 characters output
+Console: 869 characters output
 Keyboard: 0 keys pressed
 Powering off...

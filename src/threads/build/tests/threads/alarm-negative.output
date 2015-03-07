@@ -1,11 +1,11 @@
-qemu -hda /tmp/vpwW4Nl3B_.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/ED7IF21Pl6.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading..........
 Kernel command line: -q run alarm-negative
 Pintos booting with 4,088 kB RAM...
 382 pages available in kernel pool.
 382 pages available in user pool.
-Calibrating timer...  it should run before loopthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluit should run after loop!104,755,200 loops/s.
+Calibrating timer...  it should run before loopthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluit should run after loop!157,081,600 loops/s.
 Boot complete.
 Executing 'alarm-negative':
 (alarm-negative) begin
@@ -14,6 +14,6 @@ Executing 'alarm-negative':
 Execution of 'alarm-negative' complete.
 Timer: 23 ticks
 Thread: 0 idle ticks, 23 kernel ticks, 0 user ticks
-Console: 612 characters output
+Console: 629 characters output
 Keyboard: 0 keys pressed
 Powering off...

@@ -45,7 +45,7 @@ static void
 syscall_handler (struct intr_frame *f UNUSED) 
 {
   int arg[MAX_ARGS];
-  check_valid_ptr((const void*) f->esp);
+  user_to_kernel_ptr((const void*) f->esp);
   switch (* (int *) f->esp)
     {
     case SYS_HALT:
@@ -256,6 +256,15 @@ int write (int fd, const void *buffer, unsigned size)
       lock_release(&filesys_lock);
       return ERROR;
     }
+  /* Chekc whether this code is executable code or not 
+     if it is executable, return ERROR */
+/*
+  if(f == thread_current()->file)
+    {
+      lock_release(&filesys_lock);
+      return ERROR;
+    }
+*/
   int bytes = file_write(f, buffer, size);
   lock_release(&filesys_lock);
   return bytes;

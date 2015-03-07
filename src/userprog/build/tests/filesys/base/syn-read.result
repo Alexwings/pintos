@@ -1,5 +1,2 @@
 FAIL
-Kernel panic in run: PANIC at ../../userprog/process.c:113 in process_wait(): assertion `cp->return_status == -1' failed.
-Call stack: 0xc0028bce
-Translation of call stack:
-0xc0028bce: debug_panic (.../../lib/kernel/debug.c:38)
+run: TIMEOUT after 302 seconds of wall-clock time - load average: 1.21, 1.18, 0.99

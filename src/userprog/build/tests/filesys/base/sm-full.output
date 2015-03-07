@@ -1,5 +1,5 @@
 Copying tests/filesys/base/sm-full to scratch partition...
-qemu -hda /tmp/uvrXdxo5sG.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/HdaGLhdkuF.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run sm-full
@@ -19,16 +19,22 @@ Extracting ustar archive from scratch device into file system...
 Putting 'sm-full' into the file system...
 Erasing ustar archive...
 Executing 'sm-full':
-Kernel PANIC at ../../userprog/process.c:113 in process_wait(): assertion `cp->return_status == -1' failed.
-Call stack: 0xc0028bce.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 62 ticks
-Thread: 34 idle ticks, 28 kernel ticks, 0 user ticks
-hda2 (filesys): 26 reads, 194 writes
+(sm-full) begin
+(sm-full) create "quux"
+(sm-full) open "quux"
+(sm-full) writing "quux"
+(sm-full) close "quux"
+(sm-full) open "quux" for verification
+(sm-full) verified contents of "quux"
+(sm-full) close "quux"
+(sm-full) end
+sm-full: exit(0)
+Execution of 'sm-full' complete.
+Timer: 484 ticks
+Thread: 34 idle ticks, 450 kernel ticks, 0 user ticks
+hda2 (filesys): 106 reads, 222 writes
 hda3 (scratch): 94 reads, 2 writes
-Console: 1296 characters output
+Console: 1287 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

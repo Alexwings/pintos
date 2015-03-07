@@ -101,6 +101,7 @@ start_process (void *file_name_)
    child of the calling process, or if process_wait() has already
    been successfully called for the given TID, returns -1
    immediately, without waiting.
+
    This function will be implemented in problem 2-2.  For now, it
    does nothing. */
 int
@@ -147,7 +148,6 @@ process_exit (void)
   /* Destroy the current process's page directory and switch back
      to the kernel-only page directory. */
   pd = cur->pagedir;
-  
   if (pd != NULL) 
     {
       /* Correct ordering here is crucial.  We must set
@@ -157,13 +157,9 @@ process_exit (void)
          directory before destroying the process's page
          directory, or our active page directory will be one
          that's been freed (and cleared). */
-      printf ("%s: process_exit1()\n", cur->name);
       cur->pagedir = NULL;
-      printf ("%s: process_exit2()\n", cur->name);
       pagedir_activate (NULL);
-      printf ("%s: process_exit3()\n", cur->name);
       pagedir_destroy (pd);
-      printf ("%s: process_exit4()\n", cur->name);
     }
 }
 
@@ -280,6 +276,9 @@ load (const char *file_name, void (**eip) (void), void **esp,
 
   /* Open executable file. */
   file = filesys_open (file_name);
+  // ----------------- project 2 ---------------------
+  t->file = file;
+  // ==============================================
   if (file == NULL) 
     {
       printf ("load: %s: open failed\n", file_name);
@@ -372,7 +371,7 @@ load (const char *file_name, void (**eip) (void), void **esp,
   file_close (file);
   return success;
 }
-
+
 /* load() helpers. */
 
 static bool install_page (void *upage, void *kpage, bool writable);
@@ -425,11 +424,15 @@ validate_segment (const struct Elf32_Phdr *phdr, struct file *file)
 /* Loads a segment starting at offset OFS in FILE at address
    UPAGE.  In total, READ_BYTES + ZERO_BYTES bytes of virtual
    memory are initialized, as follows:
+
         - READ_BYTES bytes at UPAGE must be read from FILE
           starting at offset OFS.
+
         - ZERO_BYTES bytes at UPAGE + READ_BYTES must be zeroed.
+
    The pages initialized by this function must be writable by the
    user process if WRITABLE is true, read-only otherwise.
+
    Return true if successful, false if a memory allocation error
    or disk read error occurs. */
 static bool
@@ -499,8 +502,8 @@ setup_stack (void **esp, const char* file_name, char** save_ptr)
     }
 
   char *token;
-  char *argv[50]; 
-  int i, argc = 0;
+  char **argv = malloc(DEFAULT_ARGV*sizeof(char *));
+  int i, argc = 0, argv_size = DEFAULT_ARGV;
 
   // Push args onto stack
   for (token = (char *) file_name; token != NULL;
@@ -509,6 +512,12 @@ setup_stack (void **esp, const char* file_name, char** save_ptr)
       *esp -= strlen(token) + 1;
       argv[argc] = *esp;
       argc++;
+      // Resize argv
+      if (argc >= argv_size)
+	{
+	  argv_size *= 2;
+	  argv = realloc(argv, argv_size*sizeof(char *));
+	}
       memcpy(*esp, token, strlen(token) + 1);
     }
   argv[argc] = 0;
@@ -535,6 +544,8 @@ setup_stack (void **esp, const char* file_name, char** save_ptr)
   // Push fake return addr
   *esp -= sizeof(void *);
   memcpy(*esp, &argv[argc], sizeof(void *));
+  // Free argv
+  free(argv);
 
   return success;
 }

@@ -1,5 +1,5 @@
 Copying tests/filesys/base/syn-remove to scratch partition...
-qemu -hda /tmp/xQc11rpdO8.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/lOnrD2Vyix.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run syn-remove
@@ -19,16 +19,22 @@ Extracting ustar archive from scratch device into file system...
 Putting 'syn-remove' into the file system...
 Erasing ustar archive...
 Executing 'syn-remove':
-Kernel PANIC at ../../userprog/process.c:113 in process_wait(): assertion `cp->return_status == -1' failed.
-Call stack: 0xc0028bce.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 64 ticks
-Thread: 34 idle ticks, 30 kernel ticks, 0 user ticks
-hda2 (filesys): 26 reads, 196 writes
+(syn-remove) begin
+(syn-remove) create "deleteme"
+(syn-remove) open "deleteme"
+(syn-remove) remove "deleteme"
+(syn-remove) write "deleteme"
+(syn-remove) seek "deleteme" to 0
+(syn-remove) read "deleteme"
+(syn-remove) close "deleteme"
+(syn-remove) end
+syn-remove: exit(0)
+Execution of 'syn-remove' complete.
+Timer: 354 ticks
+Thread: 34 idle ticks, 320 kernel ticks, 0 user ticks
+hda2 (filesys): 91 reads, 209 writes
 hda3 (scratch): 95 reads, 2 writes
-Console: 1305 characters output
+Console: 1327 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

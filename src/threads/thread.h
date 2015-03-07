@@ -6,6 +6,12 @@
 #include <stdint.h>
 #include "threads/synch.h"
 
+/* -------------- project 2 ------------------ */
+#include "filesys/file.h"
+#include "filesys/filesys.h"
+#include "filesys/directory.h"
+// ==============================================
+
 /* States in a thread's life cycle. */
 enum thread_status
   {
@@ -26,11 +32,13 @@ typedef int tid_t;
 #define PRI_MAX 63                      /* Highest priority. */
 
 /* A kernel thread or user process.
+
    Each thread structure is stored in its own 4 kB page.  The
    thread structure itself sits at the very bottom of the page
    (at offset 0).  The rest of the page is reserved for the
    thread's kernel stack, which grows downward from the top of
    the page (at offset 4 kB).  Here's an illustration:
+
         4 kB +---------------------------------+
              |          kernel stack           |
              |                |                |
@@ -52,18 +60,22 @@ typedef int tid_t;
              |               name              |
              |              status             |
         0 kB +---------------------------------+
+
    The upshot of this is twofold:
+
       1. First, `struct thread' must not be allowed to grow too
          big.  If it does, then there will not be enough room for
          the kernel stack.  Our base `struct thread' is only a
          few bytes in size.  It probably should stay well under 1
          kB.
+
       2. Second, kernel stacks must not be allowed to grow too
          large.  If a stack overflows, it will corrupt the thread
          state.  Thus, kernel functions should not allocate large
          structures or arrays as non-static local variables.  Use
          dynamic allocation with malloc() or palloc_get_page()
          instead.
+
    The first symptom of either of these problems will probably be
    an assertion failure in thread_current(), which checks that
    the `magic' member of the running thread's `struct thread' is
@@ -108,21 +120,26 @@ struct thread
 #ifdef USERPROG
     /* Owned by userprog/process.c. */
     uint32_t *pagedir;                  /* Page directory. */
+
+    /* -------------------- project 2 --------------------*/
+    /* base address of ELF file  */
+    struct file *file;
+    // ====================================================
 #endif
-
-    /* Needed for system calls on file operations */
-    struct list file_list;
-    int fd;
-
-   /*  Needed for wait/exec operations */
-   struct list child_list;
-   tid_t parent;
-
-   // points to child_process struct in parent's child list.
-   struct child_process *cp;   
 
     /* Owned by thread.c. */
     unsigned magic;                     /* Detects stack overflow. */
+
+// ---------------- project 2 ---------------------------
+   // Needed for file system sys calls
+    struct list file_list;
+    int fd;
+
+    // Needed for wait / exec sys calls
+    struct list child_list;
+    tid_t parent;
+    // Points to child_process struct in parent's child list
+    struct child_process* cp;
   };
 
 /* If false (default), use round-robin scheduler.
@@ -177,5 +194,6 @@ void remove_waiters(struct lock*);
 void refresh_priority(void);
 void preemption_force(void);
 
-bool thread_alive(int pid);
+bool thread_alive (int pid);
+
 #endif /* threads/thread.h */

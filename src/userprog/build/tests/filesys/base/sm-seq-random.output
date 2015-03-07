@@ -1,5 +1,5 @@
 Copying tests/filesys/base/sm-seq-random to scratch partition...
-qemu -hda /tmp/peY0YK7wwi.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/nCZvxBtzkp.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run sm-seq-random
@@ -19,16 +19,22 @@ Extracting ustar archive from scratch device into file system...
 Putting 'sm-seq-random' into the file system...
 Erasing ustar archive...
 Executing 'sm-seq-random':
-Kernel PANIC at ../../userprog/process.c:113 in process_wait(): assertion `cp->return_status == -1' failed.
-Call stack: 0xc0028bce.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 64 ticks
-Thread: 32 idle ticks, 32 kernel ticks, 0 user ticks
-hda2 (filesys): 26 reads, 194 writes
+(sm-seq-random) begin
+(sm-seq-random) create "nibble"
+(sm-seq-random) open "nibble"
+(sm-seq-random) writing "nibble"
+(sm-seq-random) close "nibble"
+(sm-seq-random) open "nibble" for verification
+(sm-seq-random) verified contents of "nibble"
+(sm-seq-random) close "nibble"
+(sm-seq-random) end
+sm-seq-random: exit(0)
+Execution of 'sm-seq-random' complete.
+Timer: 552 ticks
+Thread: 34 idle ticks, 518 kernel ticks, 0 user ticks
+hda2 (filesys): 120 reads, 230 writes
 hda3 (scratch): 94 reads, 2 writes
-Console: 1314 characters output
+Console: 1385 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

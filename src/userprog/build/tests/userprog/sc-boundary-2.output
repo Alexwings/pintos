@@ -1,5 +1,5 @@
 Copying tests/userprog/sc-boundary-2 to scratch partition...
-qemu -hda /tmp/O45CvTJlDP.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/v7qF2X2UFm.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run sc-boundary-2
@@ -8,7 +8,7 @@ Pintos booting with 4,088 kB RAM...
 382 pages available in user pool.
 Calibrating timer...  it should run before loopthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluit should run after loop!157,081,600 loops/s.
 hda: 5,040 sectors (2 MB), model "QM00001", serial "QEMU HARDDISK"
-hda1: 176 sectors (88 kB), Pintos OS kernel (20)
+hda1: 184 sectors (92 kB), Pintos OS kernel (20)
 hda2: 4,096 sectors (2 MB), Pintos file system (21)
 hda3: 94 sectors (47 kB), Pintos scratch (22)
 filesys: using hda2
@@ -19,19 +19,14 @@ Extracting ustar archive from scratch device into file system...
 Putting 'sc-boundary-2' into the file system...
 Erasing ustar archive...
 Executing 'sc-boundary-2':
-Kernel PANIC at ../../threads/malloc.c:274 in block_to_arena(): assertion `a->magic == ARENA_MAGIC' failed.
-Call stack: 0xc0028bae 0x646e756fPage fault at 0x622d6373: not present error reading page in kernel context.
-Interrupt 0x0e (#PF Page-Fault Exception) at eip=0xc00265b7
- cr2=622d6373 error=00000000
- eax=0000000b ebx=622d6373 ecx=000007a1 edx=c010acd4
- esi=00000112 edi=c00303fa esp=c0031080 ebp=c010ad70
- cs=0008 ds=0010 es=0010 ss=756f
-Kernel PANIC recursion at ../../userprog/exception.c:103 in kill().
-Timer: 206 ticks
-Thread: 33 idle ticks, 171 kernel ticks, 2 user ticks
+(sc-boundary-2) begin
+sc-boundary-2: exit(67)
+Execution of 'sc-boundary-2' complete.
+Timer: 213 ticks
+Thread: 33 idle ticks, 180 kernel ticks, 0 user ticks
 hda2 (filesys): 65 reads, 192 writes
 hda3 (scratch): 93 reads, 2 writes
-Console: 1543 characters output
+Console: 1115 characters output
 Keyboard: 0 keys pressed
-Exception: 1 page faults
+Exception: 0 page faults
 Powering off...

@@ -1,4 +1,4 @@
-qemu -hda /tmp/Vfi1m8H2vr.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/kSVc11CN1a.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading..........
 Kernel command line: -q run alarm-single

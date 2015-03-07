@@ -1,11 +1,11 @@
-qemu -hda /tmp/DLi3oRNbIe.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/KCVoXO8_xR.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading..........
 Kernel command line: -q run priority-condvar
 Pintos booting with 4,088 kB RAM...
 382 pages available in kernel pool.
 382 pages available in user pool.
-Calibrating timer...  it should run before loopthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluit should run after loop!104,857,600 loops/s.
+Calibrating timer...  it should run before loopthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluit should run after loop!157,081,600 loops/s.
 Boot complete.
 Executing 'priority-condvar':
 (priority-condvar) begin
@@ -41,8 +41,8 @@ Executing 'priority-condvar':
 (priority-condvar) Thread priority 21 woke up.
 (priority-condvar) end
 Execution of 'priority-condvar' complete.
-Timer: 48 ticks
-Thread: 0 idle ticks, 48 kernel ticks, 0 user ticks
+Timer: 29 ticks
+Thread: 0 idle ticks, 30 kernel ticks, 0 user ticks
 Console: 1887 characters output
 Keyboard: 0 keys pressed
 Powering off...
