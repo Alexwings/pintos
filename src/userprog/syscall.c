@@ -17,7 +17,7 @@
 #define MAX_ARGS 3
 #define USER_VADDR_BOTTOM ((void *) 0x08048000)
 
-struct lock filesys_lock;
+//struct lock filesys_lock;
 
 struct process_file {
   struct file *file;
@@ -256,15 +256,7 @@ int write (int fd, const void *buffer, unsigned size)
       lock_release(&filesys_lock);
       return ERROR;
     }
-  /* Chekc whether this code is executable code or not 
-     if it is executable, return ERROR */
-/*
-  if(f == thread_current()->file)
-    {
-      lock_release(&filesys_lock);
-      return ERROR;
-    }
-*/
+
   int bytes = file_write(f, buffer, size);
   lock_release(&filesys_lock);
   return bytes;

@@ -139,6 +139,14 @@ process_exit (void)
   // Free child list
   remove_child_processes();
 
+  // close the executable file
+    if (cur->file != NULL)
+    {  
+      lock_acquire (&filesys_lock);
+      file_allow_write (cur->file); 
+      file_close (cur->file);
+      lock_release (&filesys_lock);
+    }
   // Set exit value to true in case killed by the kernel
   if (thread_alive(cur->parent))
     {
@@ -275,14 +283,23 @@ load (const char *file_name, void (**eip) (void), void **esp,
   process_activate ();
 
   /* Open executable file. */
+  lock_acquire(&filesys_lock);
   file = filesys_open (file_name);
-  // ----------------- project 2 ---------------------
-  t->file = file;
-  // ==============================================
+ 
   if (file == NULL) 
     {
       printf ("load: %s: open failed\n", file_name);
+      lock_release(&filesys_lock);
       goto done; 
+    }
+
+  else
+    {
+      // Record the base address of file 
+      t->file = file;
+      // Set executable as rejective to write in 
+      file_deny_write(t->file);
+      lock_release(&filesys_lock);
     }
 
   /* Read and verify executable header. */
@@ -365,10 +382,13 @@ load (const char *file_name, void (**eip) (void), void **esp,
   *eip = (void (*) (void)) ehdr.e_entry;
 
   success = true;
+  return success;
 
  done:
   /* We arrive here whether the load is successful or not. */
   file_close (file);
+  /* Set base address of user program in thread reocrd back to 
+     NULL */
   return success;
 }
 
@@ -502,7 +522,8 @@ setup_stack (void **esp, const char* file_name, char** save_ptr)
     }
 
   char *token;
-  char **argv = malloc(DEFAULT_ARGV*sizeof(char *));
+  //char **argv = malloc(DEFAULT_ARGV*sizeof(char *));
+  char *argv[32];
   int i, argc = 0, argv_size = DEFAULT_ARGV;
 
   // Push args onto stack
@@ -513,11 +534,6 @@ setup_stack (void **esp, const char* file_name, char** save_ptr)
       argv[argc] = *esp;
       argc++;
       // Resize argv
-      if (argc >= argv_size)
-	{
-	  argv_size *= 2;
-	  argv = realloc(argv, argv_size*sizeof(char *));
-	}
       memcpy(*esp, token, strlen(token) + 1);
     }
   argv[argc] = 0;
@@ -544,8 +560,6 @@ setup_stack (void **esp, const char* file_name, char** save_ptr)
   // Push fake return addr
   *esp -= sizeof(void *);
   memcpy(*esp, &argv[argc], sizeof(void *));
-  // Free argv
-  free(argv);
 
   return success;
 }

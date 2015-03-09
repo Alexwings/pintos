@@ -4,4 +4,6 @@ devices/shutdown.o: ../../devices/shutdown.c ../../devices/shutdown.h \
  ../../lib/stdint.h ../../lib/kernel/stdio.h ../../devices/kbd.h \
  ../../devices/serial.h ../../devices/timer.h ../../lib/round.h \
  ../../threads/io.h ../../threads/thread.h ../../lib/kernel/list.h \
- ../../threads/synch.h
+ ../../threads/synch.h ../../filesys/file.h ../../filesys/off_t.h \
+ ../../filesys/filesys.h ../../filesys/directory.h ../../devices/block.h \
+ ../../lib/inttypes.h

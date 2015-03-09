@@ -1,5 +1,5 @@
 Copying tests/userprog/multi-recurse to scratch partition...
-qemu -hda /tmp/MPTYsxBb8q.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/fisioY3t7P.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run 'multi-recurse 15'

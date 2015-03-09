@@ -120,11 +120,7 @@ struct thread
 #ifdef USERPROG
     /* Owned by userprog/process.c. */
     uint32_t *pagedir;                  /* Page directory. */
-
-    /* -------------------- project 2 --------------------*/
-    /* base address of ELF file  */
-    struct file *file;
-    // ====================================================
+    struct file *file;              /* base address of executable file */
 #endif
 
     /* Owned by thread.c. */

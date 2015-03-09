@@ -1,5 +1,5 @@
 Copying tests/userprog/create-normal to scratch partition...
-qemu -hda /tmp/yBJrLVfgC_.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/VKe9f8noJa.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run create-normal
@@ -24,8 +24,8 @@ Executing 'create-normal':
 (create-normal) end
 create-normal: exit(0)
 Execution of 'create-normal' complete.
-Timer: 298 ticks
-Thread: 33 idle ticks, 265 kernel ticks, 0 user ticks
+Timer: 279 ticks
+Thread: 35 idle ticks, 245 kernel ticks, 0 user ticks
 hda2 (filesys): 83 reads, 192 writes
 hda3 (scratch): 91 reads, 2 writes
 Console: 1166 characters output
