@@ -1,2 +1,6 @@
 FAIL
-run: TIMEOUT after 360 seconds of host CPU time
+Kernel panic in run: PANIC at ../../filesys/inode.c:336 in inode_allow_write(): assertion `inode->deny_write_cnt <= inode->open_cnt' failed.
+Call stack: 0xc0028bae 0xcccccccc
+Translation of call stack:
+0xc0028bae: debug_panic (.../../lib/kernel/debug.c:38)
+0xcccccccc: (unknown)

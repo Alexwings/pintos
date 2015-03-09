@@ -117,10 +117,7 @@ process_wait (tid_t child_tid UNUSED)
       return ERROR;
     }
   cp->wait = true;
-  while (!cp->exit)
-    {
-      barrier();
-    }
+  sema_down(&cp->sema);
   int status = cp->status;
   remove_child_process(cp);
   return status;
@@ -149,9 +146,7 @@ process_exit (void)
     }
   // Set exit value to true in case killed by the kernel
   if (thread_alive(cur->parent))
-    {
-      cur->cp->exit = true;
-    }
+    sema_up(&cur->cp->sema);
 
   /* Destroy the current process's page directory and switch back
      to the kernel-only page directory. */
@@ -252,7 +247,6 @@ struct Elf32_Phdr
 
 // Used for setup_stack
 #define WORD_SIZE 4
-#define DEFAULT_ARGV 2
 
 static bool setup_stack (void **esp, const char* file_name,
 			 char** save_ptr);
@@ -524,7 +518,7 @@ setup_stack (void **esp, const char* file_name, char** save_ptr)
   char *token;
   //char **argv = malloc(DEFAULT_ARGV*sizeof(char *));
   char *argv[32];
-  int i, argc = 0, argv_size = DEFAULT_ARGV;
+  int i, argc = 0;
 
   // Push args onto stack
   for (token = (char *) file_name; token != NULL;

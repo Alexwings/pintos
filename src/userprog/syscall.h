@@ -14,10 +14,9 @@ struct child_process {
   int pid;
   int load;
   bool wait;
-  bool exit;
   int status;
-  struct lock wait_lock;
   struct list_elem elem;
+  struct semaphore sema;
 };
 
 struct child_process* add_child_process (int pid);

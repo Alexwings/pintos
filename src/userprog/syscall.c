@@ -373,8 +373,7 @@ struct child_process* add_child_process (int pid)
   cp->pid = pid;
   cp->load = NOT_LOADED;
   cp->wait = false;
-  cp->exit = false;
-  lock_init(&cp->wait_lock);
+  sema_init(&cp->sema, 0);
   list_push_back(&thread_current()->child_list,
 		 &cp->elem);
   return cp;

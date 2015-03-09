@@ -1,6 +1,6 @@
 Copying tests/userprog/read-boundary to scratch partition...
 Copying ../../tests/userprog/sample.txt to scratch partition...
-qemu -hda /tmp/BYqY7dtlV9.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/TNBiLLZ0fF.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run read-boundary
@@ -26,11 +26,11 @@ Executing 'read-boundary':
 (read-boundary) end
 read-boundary: exit(0)
 Execution of 'read-boundary' complete.
-Timer: 225 ticks
-Thread: 36 idle ticks, 190 kernel ticks, 0 user ticks
+Timer: 69 ticks
+Thread: 35 idle ticks, 31 kernel ticks, 3 user ticks
 hda2 (filesys): 96 reads, 200 writes
 hda3 (scratch): 96 reads, 2 writes
-Console: 1213 characters output
+Console: 1211 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

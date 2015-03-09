@@ -1,6 +1,6 @@
 Copying tests/userprog/close-normal to scratch partition...
 Copying ../../tests/userprog/sample.txt to scratch partition...
-qemu -hda /tmp/l39XV8WF7O.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/KJGzE9Rlj3.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run close-normal
@@ -27,11 +27,11 @@ Executing 'close-normal':
 (close-normal) end
 close-normal: exit(0)
 Execution of 'close-normal' complete.
-Timer: 203 ticks
-Thread: 34 idle ticks, 169 kernel ticks, 0 user ticks
+Timer: 68 ticks
+Thread: 39 idle ticks, 27 kernel ticks, 2 user ticks
 hda2 (filesys): 92 reads, 194 writes
 hda3 (scratch): 93 reads, 2 writes
-Console: 1239 characters output
+Console: 1237 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

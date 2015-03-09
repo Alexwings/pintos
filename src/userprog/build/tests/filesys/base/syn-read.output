@@ -1,6 +1,6 @@
 Copying tests/filesys/base/syn-read to scratch partition...
 Copying tests/filesys/base/child-syn-read to scratch partition...
-qemu -hda /tmp/ID0vAkJJMA.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/HmFT1JEx0M.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run syn-read
@@ -34,5 +34,13 @@ child-syn-read: exit(1)
 (syn-read) exec child 4 of 10: "child-syn-read 3"
 child-syn-read: exit(2)
 (syn-read) exec child 5 of 10: "child-syn-read 4"
+child-syn-read: exit(3)
+(syn-read) exec child 6 of 10: "child-syn-read 5"
+child-syn-read: exit(4)
+(syn-read) exec child 7 of 10: "child-syn-read 6"
+child-syn-read: exit(5)
+(syn-read) exec child 8 of 10: "child-syn-read 7"
+child-syn-read: exit(6)
+(syn-read) exec child 9 of 10: "child-syn-read 8"
 
 TIMEOUT after 300 seconds of host CPU time
