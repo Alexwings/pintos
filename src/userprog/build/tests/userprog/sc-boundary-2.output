@@ -1,12 +1,12 @@
 Copying tests/userprog/sc-boundary-2 to scratch partition...
-qemu -hda /tmp/H4GBycFyhn.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/6V0M7uI8PD.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run sc-boundary-2
 Pintos booting with 4,088 kB RAM...
 382 pages available in kernel pool.
 382 pages available in user pool.
-Calibrating timer...  it should run before loopthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluit should run after loop!157,081,600 loops/s.
+Calibrating timer...  it should run before loopthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluit should run after loop!130,867,200 loops/s.
 hda: 5,040 sectors (2 MB), model "QM00001", serial "QEMU HARDDISK"
 hda1: 184 sectors (92 kB), Pintos OS kernel (20)
 hda2: 4,096 sectors (2 MB), Pintos file system (21)
@@ -22,8 +22,8 @@ Executing 'sc-boundary-2':
 (sc-boundary-2) begin
 sc-boundary-2: exit(67)
 Execution of 'sc-boundary-2' complete.
-Timer: 66 ticks
-Thread: 35 idle ticks, 30 kernel ticks, 1 user ticks
+Timer: 72 ticks
+Thread: 41 idle ticks, 30 kernel ticks, 1 user ticks
 hda2 (filesys): 65 reads, 192 writes
 hda3 (scratch): 93 reads, 2 writes
 Console: 1113 characters output

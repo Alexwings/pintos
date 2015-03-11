@@ -158,9 +158,15 @@ pid_t exec (const char *cmd_line)
   pid_t pid = process_execute(cmd_line);
   struct child_process* cp = get_child_process(pid);
   ASSERT(cp);
+/*
   while (cp->load == NOT_LOADED)
     {
       barrier();
+    }
+*/
+  if (cp->load == NOT_LOADED)
+    {
+      sema_down(&cp->sema_load);
     }
   if (cp->load == LOAD_FAIL)
     {
@@ -373,7 +379,8 @@ struct child_process* add_child_process (int pid)
   cp->pid = pid;
   cp->load = NOT_LOADED;
   cp->wait = false;
-  sema_init(&cp->sema, 0);
+  sema_init (&cp->sema, 0);
+  sema_init (&cp->sema_load, 0);
   list_push_back(&thread_current()->child_list,
 		 &cp->elem);
   return cp;

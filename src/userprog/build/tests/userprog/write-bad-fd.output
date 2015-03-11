@@ -1,5 +1,5 @@
 Copying tests/userprog/write-bad-fd to scratch partition...
-qemu -hda /tmp/KpCBpF2qWB.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/SlHwl7xD_S.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run write-bad-fd
@@ -24,7 +24,7 @@ Executing 'write-bad-fd':
 write-bad-fd: exit(0)
 Execution of 'write-bad-fd' complete.
 Timer: 66 ticks
-Thread: 38 idle ticks, 27 kernel ticks, 1 user ticks
+Thread: 34 idle ticks, 32 kernel ticks, 1 user ticks
 hda2 (filesys): 65 reads, 188 writes
 hda3 (scratch): 91 reads, 2 writes
 Console: 1125 characters output

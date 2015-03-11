@@ -1,6 +1,6 @@
 Copying tests/userprog/exec-once to scratch partition...
 Copying tests/userprog/child-simple to scratch partition...
-qemu -hda /tmp/pXkXLOon0o.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/OGFhK6C96e.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run exec-once
@@ -27,11 +27,11 @@ child-simple: exit(81)
 (exec-once) end
 exec-once: exit(0)
 Execution of 'exec-once' complete.
-Timer: 223 ticks
-Thread: 39 idle ticks, 33 kernel ticks, 151 user ticks
+Timer: 75 ticks
+Thread: 39 idle ticks, 34 kernel ticks, 2 user ticks
 hda2 (filesys): 126 reads, 366 writes
 hda3 (scratch): 179 reads, 2 writes
-Console: 1199 characters output
+Console: 1196 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

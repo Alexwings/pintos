@@ -1,5 +1,5 @@
 Copying tests/userprog/exec-missing to scratch partition...
-qemu -hda /tmp/94r4K7f6pS.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/DAI3K4xH0U.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run exec-missing
@@ -25,11 +25,11 @@ load: no-such-file: open failed
 (exec-missing) end
 exec-missing: exit(0)
 Execution of 'exec-missing' complete.
-Timer: 137 ticks
-Thread: 35 idle ticks, 30 kernel ticks, 72 user ticks
+Timer: 67 ticks
+Thread: 36 idle ticks, 28 kernel ticks, 3 user ticks
 hda2 (filesys): 80 reads, 186 writes
 hda3 (scratch): 90 reads, 2 writes
-Console: 1199 characters output
+Console: 1197 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

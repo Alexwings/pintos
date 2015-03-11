@@ -1,6 +1,6 @@
 Copying tests/userprog/wait-twice to scratch partition...
 Copying tests/userprog/child-simple to scratch partition...
-qemu -hda /tmp/hSSQj0c_6y.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/jLILyGGadM.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run wait-twice
@@ -29,11 +29,11 @@ child-simple: exit(81)
 (wait-twice) end
 wait-twice: exit(0)
 Execution of 'wait-twice' complete.
-Timer: 210 ticks
-Thread: 39 idle ticks, 35 kernel ticks, 137 user ticks
+Timer: 78 ticks
+Thread: 39 idle ticks, 36 kernel ticks, 3 user ticks
 hda2 (filesys): 126 reads, 368 writes
 hda3 (scratch): 180 reads, 2 writes
-Console: 1268 characters output
+Console: 1265 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

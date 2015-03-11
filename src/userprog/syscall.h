@@ -17,6 +17,7 @@ struct child_process {
   int status;
   struct list_elem elem;
   struct semaphore sema;
+  struct semaphore sema_load;
 };
 
 struct child_process* add_child_process (int pid);

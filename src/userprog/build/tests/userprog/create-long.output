@@ -1,5 +1,5 @@
 Copying tests/userprog/create-long to scratch partition...
-qemu -hda /tmp/OuXv6k9lKN.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/2rNMGhZBad.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run create-long
@@ -25,7 +25,7 @@ Executing 'create-long':
 create-long: exit(0)
 Execution of 'create-long' complete.
 Timer: 67 ticks
-Thread: 36 idle ticks, 29 kernel ticks, 2 user ticks
+Thread: 34 idle ticks, 32 kernel ticks, 1 user ticks
 hda2 (filesys): 64 reads, 192 writes
 hda3 (scratch): 91 reads, 2 writes
 Console: 1150 characters output

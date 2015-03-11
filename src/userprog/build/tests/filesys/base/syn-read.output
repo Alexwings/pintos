@@ -1,6 +1,6 @@
 Copying tests/filesys/base/syn-read to scratch partition...
 Copying tests/filesys/base/child-syn-read to scratch partition...
-qemu -hda /tmp/HmFT1JEx0M.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/NKFbSj8gA9.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run syn-read
@@ -42,5 +42,28 @@ child-syn-read: exit(5)
 (syn-read) exec child 8 of 10: "child-syn-read 7"
 child-syn-read: exit(6)
 (syn-read) exec child 9 of 10: "child-syn-read 8"
-
-TIMEOUT after 300 seconds of host CPU time
+child-syn-read: exit(7)
+(syn-read) exec child 10 of 10: "child-syn-read 9"
+child-syn-read: exit(8)
+(syn-read) wait for child 1 of 10 returned 0 (expected 0)
+(syn-read) wait for child 2 of 10 returned 1 (expected 1)
+(syn-read) wait for child 3 of 10 returned 2 (expected 2)
+(syn-read) wait for child 4 of 10 returned 3 (expected 3)
+(syn-read) wait for child 5 of 10 returned 4 (expected 4)
+(syn-read) wait for child 6 of 10 returned 5 (expected 5)
+(syn-read) wait for child 7 of 10 returned 6 (expected 6)
+(syn-read) wait for child 8 of 10 returned 7 (expected 7)
+(syn-read) wait for child 9 of 10 returned 8 (expected 8)
+child-syn-read: exit(9)
+(syn-read) wait for child 10 of 10 returned 9 (expected 9)
+(syn-read) end
+syn-read: exit(0)
+Execution of 'syn-read' complete.
+Timer: 441 ticks
+Thread: 230 idle ticks, 35 kernel ticks, 176 user ticks
+hda2 (filesys): 10780 reads, 414 writes
+hda3 (scratch): 199 reads, 2 writes
+Console: 2574 characters output
+Keyboard: 0 keys pressed
+Exception: 0 page faults
+Powering off...

@@ -73,11 +73,13 @@ start_process (void *file_name_)
   success = load (file_name, &if_.eip, &if_.esp, &save_ptr);
   if (success)
     {
-      thread_current()->cp->load = LOAD_SUCCESS;
+      thread_current ()->cp->load = LOAD_SUCCESS;
+      sema_up (&thread_current ()->cp->sema_load);
     }
   else
     {
-      thread_current()->cp->load = LOAD_FAIL;
+      thread_current ()->cp->load = LOAD_FAIL;
+      sema_up (&thread_current ()->cp->sema_load);
     }
 
   /* If load failed, quit. */
@@ -376,11 +378,11 @@ load (const char *file_name, void (**eip) (void), void **esp,
   *eip = (void (*) (void)) ehdr.e_entry;
 
   success = true;
-  return success;
+  //return success;
 
  done:
   /* We arrive here whether the load is successful or not. */
-  file_close (file);
+  //file_close (file);
   /* Set base address of user program in thread reocrd back to 
      NULL */
   return success;
