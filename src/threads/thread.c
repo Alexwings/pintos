@@ -221,9 +221,19 @@ thread_create (const char *name, int priority,
 
   intr_set_level(old_level);
 
-  // Add child process to child list
+  // Initialize the child_process object, and add it to current thread's child list
   t->parent = thread_tid();
-  struct child_process *cp = add_child_process(t->tid);
+  //struct child_process *cp = add_child_process(t->tid);
+
+  struct child_process *cp = malloc (sizeof (struct child_process));
+  cp->pid = t->tid;
+  cp->load = NOT_LOADED;
+  cp->wait = false;
+  sema_init (&cp->sema, 0);
+  sema_init (&cp->sema_load, 0);
+  list_push_back (&thread_current ()->child_list,
+		 &cp->elem);
+
   t->cp = cp;
 
   /* Add to run queue. */

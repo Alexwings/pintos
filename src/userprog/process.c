@@ -41,7 +41,7 @@ process_execute (const char *file_name)
     return TID_ERROR;
   strlcpy (fn_copy, file_name, PGSIZE);
 
-  // Get parsed file name
+  // Get real file name
   char *save_ptr;
   file_name = strtok_r((char *) file_name, " ", &save_ptr);
 
@@ -61,7 +61,7 @@ start_process (void *file_name_)
   struct intr_frame if_;
   bool success;
 
-  // Get actual file name (first parsed token)
+  // Get real file name
   char *save_ptr;
   file_name = strtok_r(file_name, " ", &save_ptr);
 
@@ -71,16 +71,10 @@ start_process (void *file_name_)
   if_.cs = SEL_UCSEG;
   if_.eflags = FLAG_IF | FLAG_MBS;
   success = load (file_name, &if_.eip, &if_.esp, &save_ptr);
-  if (success)
-    {
-      thread_current ()->cp->load = LOAD_SUCCESS;
-      sema_up (&thread_current ()->cp->sema_load);
-    }
-  else
-    {
-      thread_current ()->cp->load = LOAD_FAIL;
-      sema_up (&thread_current ()->cp->sema_load);
-    }
+
+  // Inform the father thread to continue executing
+  thread_current ()->cp->load = success ? LOAD_SUCCESS : LOAD_FAIL;
+  sema_up (&thread_current ()->cp->sema_load);
 
   /* If load failed, quit. */
   palloc_free_page (file_name);
@@ -110,18 +104,19 @@ int
 process_wait (tid_t child_tid UNUSED) 
 {
   struct child_process* cp = get_child_process(child_tid);
-  if (!cp)
+  if (!cp || cp->wait)
     {
       return ERROR;
     }
-  if (cp->wait)
-    {
-      return ERROR;
-    }
+
   cp->wait = true;
-  sema_down(&cp->sema);
+  sema_down (&cp->sema);
   int status = cp->status;
-  remove_child_process(cp);
+
+  // Remove this child process and free its space
+  list_remove (&cp->elem);
+  free (cp);
+
   return status;
 }
 
@@ -133,19 +128,37 @@ process_exit (void)
   uint32_t *pd;
 
   // Close all files opened by process
-  process_close_file(CLOSE_ALL);
+  struct list_elem *next, *e = list_begin (&cur->file_list);
+  while (e != list_end (&cur->file_list))
+  {
+    next = list_next (e);
+    struct process_file *pf = list_entry (e, struct process_file, elem);
+    file_close (pf->file);
+    list_remove (&pf->elem);
+    free (pf);
+    e = next;
+  }
 
-  // Free child list
-  remove_child_processes();
+  // Remove all child processes
+  e = list_begin (&cur->child_list);
+  while (e != list_end (&cur->child_list))
+  {
+    next = list_next (e);
+    struct child_process *cp = list_entry (e, struct child_process, elem);
+    list_remove (&cp->elem);
+    free (cp);
+    e = next;
+  }
 
   // close the executable file
-    if (cur->file != NULL)
-    {  
-      lock_acquire (&filesys_lock);
-      file_allow_write (cur->file); 
-      file_close (cur->file);
-      lock_release (&filesys_lock);
-    }
+  if (cur->file != NULL)
+  {  
+    lock_acquire (&filesys_lock);
+    file_allow_write (cur->file); 
+    file_close (cur->file);
+    lock_release (&filesys_lock);
+  }
+
   // Set exit value to true in case killed by the kernel
   if (thread_alive(cur->parent))
     sema_up(&cur->cp->sema);
@@ -518,8 +531,7 @@ setup_stack (void **esp, const char* file_name, char** save_ptr)
     }
 
   char *token;
-  //char **argv = malloc(DEFAULT_ARGV*sizeof(char *));
-  char *argv[32];
+  char *argv[64];
   int i, argc = 0;
 
   // Push args onto stack
@@ -546,10 +558,10 @@ setup_stack (void **esp, const char* file_name, char** save_ptr)
       *esp -= sizeof(char *);
       memcpy(*esp, &argv[i], sizeof(char *));
     }
-  // Push argv
-  token = *esp;
+  // Push previous address of esp
+  char *temp = *esp;
   *esp -= sizeof(char **);
-  memcpy(*esp, &token, sizeof(char **));
+  memcpy(*esp, &temp, sizeof(char **));
   // Push argc
   *esp -= sizeof(int);
   memcpy(*esp, &argc, sizeof(int));

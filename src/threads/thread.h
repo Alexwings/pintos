@@ -126,7 +126,8 @@ struct thread
     /* Owned by thread.c. */
     unsigned magic;                     /* Detects stack overflow. */
 
-// ---------------- project 2 ---------------------------
+   /* ---------------- project 2 ---------------- */
+
    // Needed for file system sys calls
     struct list file_list;
     int fd;
@@ -134,6 +135,7 @@ struct thread
     // Needed for wait / exec sys calls
     struct list child_list;
     tid_t parent;
+
     // Points to child_process struct in parent's child list
     struct child_process* cp;
   };

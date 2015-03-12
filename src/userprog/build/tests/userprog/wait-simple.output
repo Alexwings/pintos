@@ -1,6 +1,6 @@
 Copying tests/userprog/wait-simple to scratch partition...
 Copying tests/userprog/child-simple to scratch partition...
-qemu -hda /tmp/DsTzoN4cb4.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/0cCD9Y4zDA.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run wait-simple
@@ -9,7 +9,7 @@ Pintos booting with 4,088 kB RAM...
 382 pages available in user pool.
 Calibrating timer...  it should run before loopthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluit should run after loop!157,081,600 loops/s.
 hda: 5,040 sectors (2 MB), model "QM00001", serial "QEMU HARDDISK"
-hda1: 184 sectors (92 kB), Pintos OS kernel (20)
+hda1: 176 sectors (88 kB), Pintos OS kernel (20)
 hda2: 4,096 sectors (2 MB), Pintos file system (21)
 hda3: 180 sectors (90 kB), Pintos scratch (22)
 filesys: using hda2
@@ -28,8 +28,8 @@ child-simple: exit(81)
 (wait-simple) end
 wait-simple: exit(0)
 Execution of 'wait-simple' complete.
-Timer: 75 ticks
-Thread: 38 idle ticks, 34 kernel ticks, 3 user ticks
+Timer: 76 ticks
+Thread: 42 idle ticks, 31 kernel ticks, 3 user ticks
 hda2 (filesys): 126 reads, 366 writes
 hda3 (scratch): 179 reads, 2 writes
 Console: 1242 characters output

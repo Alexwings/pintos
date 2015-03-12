@@ -17,22 +17,8 @@
 #define MAX_ARGS 3
 #define USER_VADDR_BOTTOM ((void *) 0x08048000)
 
-//struct lock filesys_lock;
-
-struct process_file {
-  struct file *file;
-  int fd;
-  struct list_elem elem;
-};
-
-int process_add_file (struct file *f);
-struct file* process_get_file (int fd);
 
 static void syscall_handler (struct intr_frame *);
-int user_to_kernel_ptr(const void *vaddr);
-void get_arg (struct intr_frame *f, int *arg, int n);
-void check_valid_ptr (const void *vaddr);
-void check_valid_buffer (void* buffer, unsigned size);
 
 void
 syscall_init (void) 
@@ -55,53 +41,53 @@ syscall_handler (struct intr_frame *f UNUSED)
       }
     case SYS_EXIT:
       {
-	get_arg(f, &arg[0], 1);
+	parse_args (f, &arg[0], 1);
 	exit(arg[0]);
 	break;
       }
     case SYS_EXEC:
       {
-	get_arg(f, &arg[0], 1);
+	parse_args (f, &arg[0], 1);
 	arg[0] = user_to_kernel_ptr((const void *) arg[0]);
 	f->eax = exec((const char *) arg[0]); 
 	break;
       }
     case SYS_WAIT:
       {
-	get_arg(f, &arg[0], 1);
+	parse_args (f, &arg[0], 1);
 	f->eax = wait(arg[0]);
 	break;
       }
     case SYS_CREATE:
       {
-	get_arg(f, &arg[0], 2);
+	parse_args (f, &arg[0], 2);
 	arg[0] = user_to_kernel_ptr((const void *) arg[0]);
 	f->eax = create((const char *)arg[0], (unsigned) arg[1]);
 	break;
       }
     case SYS_REMOVE:
       {
-	get_arg(f, &arg[0], 1);
+	parse_args(f, &arg[0], 1);
 	arg[0] = user_to_kernel_ptr((const void *) arg[0]);
 	f->eax = remove((const char *) arg[0]);
 	break;
       }
     case SYS_OPEN:
       {
-	get_arg(f, &arg[0], 1);
+	parse_args(f, &arg[0], 1);
 	arg[0] = user_to_kernel_ptr((const void *) arg[0]);
 	f->eax = open((const char *) arg[0]);
 	break; 		
       }
     case SYS_FILESIZE:
       {
-	get_arg(f, &arg[0], 1);
+	parse_args(f, &arg[0], 1);
 	f->eax = filesize(arg[0]);
 	break;
       }
     case SYS_READ:
       {
-	get_arg(f, &arg[0], 3);
+	parse_args(f, &arg[0], 3);
 	check_valid_buffer((void *) arg[1], (unsigned) arg[2]);
 	arg[1] = user_to_kernel_ptr((const void *) arg[1]);
 	f->eax = read(arg[0], (void *) arg[1], (unsigned) arg[2]);
@@ -109,7 +95,7 @@ syscall_handler (struct intr_frame *f UNUSED)
       }
     case SYS_WRITE:
       { 
-	get_arg(f, &arg[0], 3);
+	parse_args(f, &arg[0], 3);
 	check_valid_buffer((void *) arg[1], (unsigned) arg[2]);
 	arg[1] = user_to_kernel_ptr((const void *) arg[1]);
 	f->eax = write(arg[0], (const void *) arg[1],
@@ -118,19 +104,19 @@ syscall_handler (struct intr_frame *f UNUSED)
       }
     case SYS_SEEK:
       {
-	get_arg(f, &arg[0], 2);
+	parse_args(f, &arg[0], 2);
 	seek(arg[0], (unsigned) arg[1]);
 	break;
       } 
     case SYS_TELL:
       { 
-	get_arg(f, &arg[0], 1);
+	parse_args(f, &arg[0], 1);
 	f->eax = tell(arg[0]);
 	break;
       }
     case SYS_CLOSE:
       { 
-	get_arg(f, &arg[0], 1);
+	parse_args(f, &arg[0], 1);
 	close(arg[0]);
 	break;
       }
@@ -158,16 +144,13 @@ pid_t exec (const char *cmd_line)
   pid_t pid = process_execute(cmd_line);
   struct child_process* cp = get_child_process(pid);
   ASSERT(cp);
-/*
-  while (cp->load == NOT_LOADED)
-    {
-      barrier();
-    }
-*/
+
+  //Block the current thread if cp is not loaded yet.
   if (cp->load == NOT_LOADED)
     {
       sema_down(&cp->sema_load);
     }
+
   if (cp->load == LOAD_FAIL)
     {
       return ERROR;
@@ -205,9 +188,17 @@ int open (const char *file)
       lock_release(&filesys_lock);
       return ERROR;
     }
-  int fd = process_add_file(f);
+  
+  //Allocate space for the process_file variable
+  struct process_file *pf = malloc (sizeof (struct process_file));
+  pf->file = f;
+  pf->fd = thread_current ()->fd++;
+
+  //Add this file to the file list of the current thread
+  list_push_back (&thread_current ()->file_list, &pf->elem);
+
   lock_release(&filesys_lock);
-  return fd;
+  return pf->fd;
 }
 
 int filesize (int fd)
@@ -226,6 +217,7 @@ int filesize (int fd)
 
 int read (int fd, void *buffer, unsigned size)
 {
+  // Read from keyboard
   if (fd == STDIN_FILENO)
     {
       unsigned i;
@@ -236,6 +228,8 @@ int read (int fd, void *buffer, unsigned size)
 	}
       return size;
     }
+
+  // Read from file
   lock_acquire(&filesys_lock);
   struct file *f = process_get_file(fd);
   if (!f)
@@ -250,11 +244,14 @@ int read (int fd, void *buffer, unsigned size)
 
 int write (int fd, const void *buffer, unsigned size)
 {
+  // Write to screen
   if (fd == STDOUT_FILENO)
     {
       putbuf(buffer, size);
       return size;
     }
+
+  // Write to file
   lock_acquire(&filesys_lock);
   struct file *f = process_get_file(fd);
   if (!f)
@@ -262,7 +259,6 @@ int write (int fd, const void *buffer, unsigned size)
       lock_release(&filesys_lock);
       return ERROR;
     }
-
   int bytes = file_write(f, buffer, size);
   lock_release(&filesys_lock);
   return bytes;
@@ -298,39 +294,42 @@ unsigned tell (int fd)
 void close (int fd)
 {
   lock_acquire(&filesys_lock);
-  process_close_file(fd);
-  lock_release(&filesys_lock);
-}
+  
+  // Remove this file from file list of current thread and free its space
+  struct thread *cur = thread_current ();
+  struct list_elem *next, *e = list_begin (&cur->file_list);
 
-void check_valid_ptr (const void *vaddr)
-{
-  if (!is_user_vaddr(vaddr) || vaddr < USER_VADDR_BOTTOM)
+  while (e != list_end (&cur->file_list))
+  {
+    next = list_next(e);
+    struct process_file *pf = list_entry (e, struct process_file, elem);
+    if (fd == pf->fd)
     {
-      exit(ERROR);
+      file_close (pf->file);
+      list_remove (&pf->elem);
+      free (pf);
+      e = next;
     }
+  }
+
+  lock_release(&filesys_lock);
 }
 
 int user_to_kernel_ptr(const void *vaddr)
 {
-  // TO DO: Need to check if all bytes within range are correct
-  // for strings + buffers
-  check_valid_ptr(vaddr);
+  // Check if vaddr is in the range of user memory
+  if (!is_user_vaddr (vaddr) || vaddr < USER_VADDR_BOTTOM)
+  {
+    exit (ERROR);
+  }
+  
+  // Look for vaddr in page directory of kernel
   void *ptr = pagedir_get_page(thread_current()->pagedir, vaddr);
   if (!ptr)
-    {
-      exit(ERROR);
-    }
+  {
+    exit(ERROR);
+  }
   return (int) ptr;
-}
-
-int process_add_file (struct file *f)
-{
-  struct process_file *pf = malloc(sizeof(struct process_file));
-  pf->file = f;
-  pf->fd = thread_current()->fd;
-  thread_current()->fd++;
-  list_push_back(&thread_current()->file_list, &pf->elem);
-  return pf->fd;
 }
 
 struct file* process_get_file (int fd)
@@ -350,42 +349,6 @@ struct file* process_get_file (int fd)
   return NULL;
 }
 
-void process_close_file (int fd)
-{
-  struct thread *t = thread_current();
-  struct list_elem *next, *e = list_begin(&t->file_list);
-
-  while (e != list_end (&t->file_list))
-    {
-      next = list_next(e);
-      struct process_file *pf = list_entry (e, struct process_file, elem);
-      if (fd == pf->fd || fd == CLOSE_ALL)
-	{
-	  file_close(pf->file);
-	  list_remove(&pf->elem);
-	  free(pf);
-	  if (fd != CLOSE_ALL)
-	    {
-	      return;
-	    }
-	}
-      e = next;
-    }
-}
-
-struct child_process* add_child_process (int pid)
-{
-  struct child_process* cp = malloc(sizeof(struct child_process));
-  cp->pid = pid;
-  cp->load = NOT_LOADED;
-  cp->wait = false;
-  sema_init (&cp->sema, 0);
-  sema_init (&cp->sema_load, 0);
-  list_push_back(&thread_current()->child_list,
-		 &cp->elem);
-  return cp;
-}
-
 struct child_process* get_child_process (int pid)
 {
   struct thread *t = thread_current();
@@ -403,47 +366,26 @@ struct child_process* get_child_process (int pid)
   return NULL;
 }
 
-void remove_child_process (struct child_process *cp)
+void parse_args (struct intr_frame *f, int *arg, int n)
 {
-  list_remove(&cp->elem);
-  free(cp);
-}
-
-void remove_child_processes (void)
-{
-  struct thread *t = thread_current();
-  struct list_elem *next, *e = list_begin(&t->child_list);
-
-  while (e != list_end (&t->child_list))
-    {
-      next = list_next(e);
-      struct child_process *cp = list_entry (e, struct child_process,
-					     elem);
-      list_remove(&cp->elem);
-      free(cp);
-      e = next;
-    }
-}
-
-void get_arg (struct intr_frame *f, int *arg, int n)
-{
+  // Assign arg using the values that esp points to
   int i;
   int *ptr;
   for (i = 0; i < n; i++)
     {
       ptr = (int *) f->esp + i + 1;
-      check_valid_ptr((const void *) ptr);
+      user_to_kernel_ptr((const void *) ptr);
       arg[i] = *ptr;
     }
 }
 
 void check_valid_buffer (void* buffer, unsigned size)
 {
-  unsigned i;
+  // Check if every byte's address is valid
+  int i;
   char* local_buffer = (char *) buffer;
   for (i = 0; i < size; i++)
     {
-      check_valid_ptr((const void*) local_buffer);
-      local_buffer++;
+      user_to_kernel_ptr((const void *) local_buffer++);
     }
 }
