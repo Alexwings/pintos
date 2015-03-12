@@ -14,8 +14,8 @@
 #include "userprog/pagedir.h"
 #include "userprog/process.h"
 
-#define MAX_ARGS 3
-#define USER_VADDR_BOTTOM ((void *) 0x08048000)
+#define ARGS 3
+#define USER_BOTTOM ((void *) 0x08048000)
 
 
 static void syscall_handler (struct intr_frame *);
@@ -30,7 +30,7 @@ syscall_init (void)
 static void
 syscall_handler (struct intr_frame *f UNUSED) 
 {
-  int arg[MAX_ARGS];
+  int arg[ARGS];
   user_to_kernel_ptr((const void*) f->esp);
   switch (* (int *) f->esp)
     {
@@ -130,28 +130,28 @@ void halt (void)
 
 void exit (int status)
 {
-  struct thread *cur = thread_current();
-  if (thread_alive(cur->parent))
+  struct thread *c = thread_current();
+  if (thread_alive(c->parent))
     {
-      cur->cp->status = status;
+      c->cp->status = status;
     }
-  printf ("%s: exit(%d)\n", cur->name, status);
+  printf ("%s: exit(%d)\n", c->name, status);
   thread_exit();
 }
 
 pid_t exec (const char *cmd_line)
 {
   pid_t pid = process_execute(cmd_line);
-  struct child_process* cp = get_child_process(pid);
-  ASSERT(cp);
+  struct child_process* child_pro = get_child_process(pid);
+  ASSERT(child_pro);
 
-  //Block the current thread if cp is not loaded yet.
-  if (cp->load == NOT_LOADED)
+  //Block the current thread if child_pro is not loaded yet.
+  if (child_pro->load == NOT_LOADED)
     {
-      sema_down(&cp->sema_load);
+      sema_down(&child_pro->sema_load);
     }
 
-  if (cp->load == LOAD_FAIL)
+  if (child_pro->load == LOAD_FAIL)
     {
       return ERROR;
     }
@@ -163,42 +163,42 @@ int wait (pid_t pid)
   return process_wait(pid);
 }
 
-bool create (const char *file, unsigned initial_size)
+bool create (const char *f, unsigned init_size)
 {
   lock_acquire(&filesys_lock);
-  bool success = filesys_create(file, initial_size);
+  bool success = filesys_create(f, init_size);
   lock_release(&filesys_lock);
   return success;
 }
 
-bool remove (const char *file)
+bool remove (const char *f)
 {
   lock_acquire(&filesys_lock);
-  bool success = filesys_remove(file);
+  bool success = filesys_remove(f);
   lock_release(&filesys_lock);
   return success;
 }
 
-int open (const char *file)
+int open (const char *f)
 {
   lock_acquire(&filesys_lock);
-  struct file *f = filesys_open(file);
-  if (!f)
+  struct file *file = filesys_open(f);
+  if (!file)
     {
       lock_release(&filesys_lock);
       return ERROR;
     }
   
   //Allocate space for the process_file variable
-  struct process_file *pf = malloc (sizeof (struct process_file));
-  pf->file = f;
-  pf->fd = thread_current ()->fd++;
+  struct process_file *pro_f = malloc (sizeof (struct process_file));
+  pro_f->file = file;
+  pro_f->fd = thread_current ()->fd++;
 
   //Add this file to the file list of the current thread
-  list_push_back (&thread_current ()->file_list, &pf->elem);
+  list_push_back (&thread_current ()->file_list, &pro_f->elem);
 
   lock_release(&filesys_lock);
-  return pf->fd;
+  return pro_f->fd;
 }
 
 int filesize (int fd)
@@ -210,9 +210,9 @@ int filesize (int fd)
       lock_release(&filesys_lock);
       return ERROR;
     }
-  int size = file_length(f);
+  int length = file_length(f);
   lock_release(&filesys_lock);
-  return size;
+  return length;
 }
 
 int read (int fd, void *buffer, unsigned size)
@@ -318,7 +318,7 @@ void close (int fd)
 int user_to_kernel_ptr(const void *vaddr)
 {
   // Check if vaddr is in the range of user memory
-  if (!is_user_vaddr (vaddr) || vaddr < USER_VADDR_BOTTOM)
+  if (!is_user_vaddr (vaddr) || vaddr < USER_BOTTOM)
   {
     exit (ERROR);
   }

@@ -1,12 +1,12 @@
 Copying tests/userprog/open-null to scratch partition...
-qemu -hda /tmp/eMisqP1kfp.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/Sc05LA9iXQ.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run open-null
 Pintos booting with 4,088 kB RAM...
 382 pages available in kernel pool.
 382 pages available in user pool.
-Calibrating timer...  it should run before loopthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluit should run after loop!104,755,200 loops/s.
+Calibrating timer...  it should run before loopthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluit should run after loop!157,081,600 loops/s.
 hda: 5,040 sectors (2 MB), model "QM00001", serial "QEMU HARDDISK"
 hda1: 176 sectors (88 kB), Pintos OS kernel (20)
 hda2: 4,096 sectors (2 MB), Pintos file system (21)
@@ -23,10 +23,10 @@ Executing 'open-null':
 open-null: exit(-1)
 Execution of 'open-null' complete.
 Timer: 65 ticks
-Thread: 35 idle ticks, 29 kernel ticks, 1 user ticks
+Thread: 34 idle ticks, 31 kernel ticks, 1 user ticks
 hda2 (filesys): 63 reads, 186 writes
 hda3 (scratch): 90 reads, 2 writes
-Console: 1072 characters output
+Console: 1089 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

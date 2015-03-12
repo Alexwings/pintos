@@ -1,5 +1,5 @@
 Copying tests/userprog/multi-recurse to scratch partition...
-qemu -hda /tmp/IibWRExQUi.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/jVCeRhTR_2.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run 'multi-recurse 15'
@@ -83,8 +83,8 @@ multi-recurse: exit(14)
 (multi-recurse) end 15
 multi-recurse: exit(15)
 Execution of 'multi-recurse' complete.
-Timer: 112 ticks
-Thread: 44 idle ticks, 31 kernel ticks, 37 user ticks
+Timer: 105 ticks
+Thread: 44 idle ticks, 31 kernel ticks, 30 user ticks
 hda2 (filesys): 571 reads, 210 writes
 hda3 (scratch): 102 reads, 2 writes
 Console: 2807 characters output

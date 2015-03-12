@@ -1,5 +1,5 @@
 Copying tests/userprog/bad-read to scratch partition...
-qemu -hda /tmp/OlEpsDLKVx.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/ReADoGeMLx.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run bad-read
@@ -29,8 +29,8 @@ Interrupt 0x0e (#PF Page-Fault Exception) at eip=0x80480a3
  cs=001b ds=0023 es=0023 ss=0023
 bad-read: exit(-1)
 Execution of 'bad-read' complete.
-Timer: 67 ticks
-Thread: 35 idle ticks, 30 kernel ticks, 3 user ticks
+Timer: 75 ticks
+Thread: 36 idle ticks, 36 kernel ticks, 3 user ticks
 hda2 (filesys): 63 reads, 188 writes
 hda3 (scratch): 91 reads, 2 writes
 Console: 1441 characters output

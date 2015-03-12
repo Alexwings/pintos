@@ -1,5 +1,5 @@
 Copying tests/userprog/exec-bad-ptr to scratch partition...
-qemu -hda /tmp/w8QEbhQt4J.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/QXW6vUeY_s.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run exec-bad-ptr
@@ -22,8 +22,8 @@ Executing 'exec-bad-ptr':
 (exec-bad-ptr) begin
 exec-bad-ptr: exit(-1)
 Execution of 'exec-bad-ptr' complete.
-Timer: 66 ticks
-Thread: 33 idle ticks, 32 kernel ticks, 1 user ticks
+Timer: 69 ticks
+Thread: 35 idle ticks, 32 kernel ticks, 2 user ticks
 hda2 (filesys): 63 reads, 186 writes
 hda3 (scratch): 90 reads, 2 writes
 Console: 1107 characters output
