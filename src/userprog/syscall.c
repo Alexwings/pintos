@@ -23,7 +23,7 @@ static void syscall_handler (struct intr_frame *);
 void
 syscall_init (void) 
 {
-  lock_init(&filesys_lock);
+  lock_init(&file_lock);
   intr_register_int (0x30, 3, INTR_ON, syscall_handler, "syscall");
 }
 
@@ -31,7 +31,7 @@ static void
 syscall_handler (struct intr_frame *f UNUSED) 
 {
   int arg[ARGS];
-  user_to_kernel_ptr((const void*) f->esp);
+  user_to_kernel((const void*) f->esp);
   switch (* (int *) f->esp)
     {
     case SYS_HALT:
@@ -41,7 +41,6 @@ syscall_handler (struct intr_frame *f UNUSED)
       }
     case SYS_EXIT:
       {
-	//parse_args (f, &arg[0], 1);
         check_args_1_0(f, arg);
 	exit(arg[0]);
 	break;
@@ -54,48 +53,36 @@ syscall_handler (struct intr_frame *f UNUSED)
       }
     case SYS_WAIT:
       {
-	//parse_args (f, &arg[0], 1);
         check_args_1_0(f, arg);
 	f->eax = process_wait(arg[0]);
 	break;
       }
     case SYS_CREATE:
       {
-	//parse_args (f, &arg[0], 2);
-	//arg[0] = user_to_kernel_ptr((const void *) arg[0]);
         check_args_2_1(f, arg);
 	f->eax = create((const char *)arg[0], (unsigned) arg[1]);
 	break;
       }
     case SYS_REMOVE:
       {
-	//parse_args(f, &arg[0], 1);
-	//arg[0] = user_to_kernel_ptr((const void *) arg[0]);
         check_args_1_1(f, arg);
 	f->eax = remove((const char *) arg[0]);
 	break;
       }
     case SYS_OPEN:
       {
-	//parse_args(f, &arg[0], 1);
-	//arg[0] = user_to_kernel_ptr((const void *) arg[0]);
         check_args_1_1(f,arg);
 	f->eax = open((const char *) arg[0]);
 	break; 		
       }
     case SYS_FILESIZE:
       {
-	//parse_args(f, &arg[0], 1);
         check_args_1_0(f,arg);
 	f->eax = filesize(arg[0]);
 	break;
       }
     case SYS_READ:
       {
-/*	parse_args(f, &arg[0], 3);
-	check_valid_buffer((void *) arg[1], (unsigned) arg[2]);
-	arg[1] = user_to_kernel_ptr((const void *) arg[1]);
-*/
         check_args_3_1(f, arg);
 	f->eax = read(arg[0], (void *) arg[1], (unsigned) arg[2]);
 	break;
@@ -103,10 +90,6 @@ syscall_handler (struct intr_frame *f UNUSED)
       }
     case SYS_WRITE:
       { 
-/*	parse_args(f, &arg[0], 3);
-	check_valid_buffer((void *) arg[1], (unsigned) arg[2]);
-	arg[1] = user_to_kernel_ptr((const void *) arg[1]);
-*/
         check_args_3_1(f, arg);
 	f->eax = write(arg[0], (const void *) arg[1],
 		       (unsigned) arg[2]);
@@ -114,21 +97,18 @@ syscall_handler (struct intr_frame *f UNUSED)
       }
     case SYS_SEEK:
       {
-	//parse_args(f, &arg[0], 2);
         check_args_2_0(f, arg);
 	seek(arg[0], (unsigned) arg[1]);
 	break;
       } 
     case SYS_TELL:
       { 
-	//parse_args(f, &arg[0], 1);
-        check_args_1_0(f, arg);
+	check_args_1_0(f, arg);
 	f->eax = tell(arg[0]);
 	break;
       }
     case SYS_CLOSE:
       { 
-	//parse_args(f, &arg[0], 1);
         check_args_1_0(f, arg);
 	close(arg[0]);
 	break;
@@ -139,7 +119,7 @@ syscall_handler (struct intr_frame *f UNUSED)
 void check_args_1_0 (struct intr_frame *f, int* arg)
 {
    int *ptr = (int *) f->esp +1;
-   user_to_kernel_ptr((const void *) ptr);
+   user_to_kernel((const void *) ptr);
    arg[0] = *ptr;
 }
 
@@ -147,8 +127,8 @@ void check_args_2_0 (struct intr_frame *f, int* arg)
 {
    int *ptr = (int *) f->esp +1;
    int *ptr2 = (int *) f->esp +2;
-   user_to_kernel_ptr((const void *) ptr);
-   user_to_kernel_ptr((const void *) ptr2);
+   user_to_kernel((const void *) ptr);
+   user_to_kernel((const void *) ptr2);
    arg[0] = *ptr;
    arg[1] = *ptr2;
 }
@@ -156,20 +136,20 @@ void check_args_2_0 (struct intr_frame *f, int* arg)
 void check_args_1_1 (struct intr_frame *f, int* arg)
 {
    int *ptr = (int *) f->esp +1;
-   user_to_kernel_ptr((const void *) ptr);
+   user_to_kernel((const void *) ptr);
    arg[0] = *ptr;
-   arg[0] = user_to_kernel_ptr((const void *) arg[0]);
+   arg[0] = user_to_kernel((const void *) arg[0]);
 }
 
 void check_args_2_1 (struct intr_frame *f, int* arg)
 {
    int *ptr = (int *) f->esp +1;
    int *ptr2 = (int *) f->esp +2;
-   user_to_kernel_ptr((const void *) ptr);
-   user_to_kernel_ptr((const void *) ptr2);
+   user_to_kernel((const void *) ptr);
+   user_to_kernel((const void *) ptr2);
    arg[0] = *ptr;
    arg[1] = *ptr2;
-   arg[0] = user_to_kernel_ptr((const void *) arg[0]);
+   arg[0] = user_to_kernel((const void *) arg[0]);
 }
 
 void check_args_3_1  (struct intr_frame *f, int* arg)
@@ -177,14 +157,14 @@ void check_args_3_1  (struct intr_frame *f, int* arg)
    int *ptr = (int *) f->esp +1;
    int *ptr2 = (int *) f->esp +2;
    int *ptr3 = (int *) f->esp +3;
-   user_to_kernel_ptr((const void *) ptr);
-   user_to_kernel_ptr((const void *) ptr2);
-   user_to_kernel_ptr((const void *) ptr3);
+   user_to_kernel((const void *) ptr);
+   user_to_kernel((const void *) ptr2);
+   user_to_kernel((const void *) ptr3);
    arg[0] = *ptr;
    arg[1] = *ptr2;
    arg[2] = *ptr3;
    check_valid_buffer((void *) arg[1], (unsigned) arg[2]);
-   arg[1] = user_to_kernel_ptr((const void *) arg[1]);
+   arg[1] = user_to_kernel((const void *) arg[1]);
 }
 
 
@@ -207,7 +187,7 @@ void exit (int status)
 pid_t exec (const char *cmd_line)
 {
   pid_t pid = process_execute(cmd_line);
-  struct child_process* child_pro = get_child_process(pid);
+  struct child_process* child_pro = get_child(pid);
   ASSERT(child_pro);
 
   //Block the current thread if child_pro is not loaded yet.
@@ -230,27 +210,27 @@ int wait (pid_t pid)
 
 bool create (const char *f, unsigned init_size)
 {
-  lock_acquire(&filesys_lock);
+  lock_acquire(&file_lock);
   bool success = filesys_create(f, init_size);
-  lock_release(&filesys_lock);
+  lock_release(&file_lock);
   return success;
 }
 
 bool remove (const char *f)
 {
-  lock_acquire(&filesys_lock);
+  lock_acquire(&file_lock);
   bool success = filesys_remove(f);
-  lock_release(&filesys_lock);
+  lock_release(&file_lock);
   return success;
 }
 
 int open (const char *f)
 {
-  lock_acquire(&filesys_lock);
+  lock_acquire(&file_lock);
   struct file *file = filesys_open(f);
   if (!file)
     {
-      lock_release(&filesys_lock);
+      lock_release(&file_lock);
       return ERROR;
     }
   
@@ -262,21 +242,21 @@ int open (const char *f)
   //Add this file to the file list of the current thread
   list_push_back (&thread_current ()->file_list, &pro_f->elem);
 
-  lock_release(&filesys_lock);
+  lock_release(&file_lock);
   return pro_f->fd;
 }
 
 int filesize (int fd)
 {
-  lock_acquire(&filesys_lock);
-  struct file *f = process_get_file(fd);
+  lock_acquire(&file_lock);
+  struct file *f = find_file(fd);
   if (!f)
     {
-      lock_release(&filesys_lock);
+      lock_release(&file_lock);
       return ERROR;
     }
   int length = file_length(f);
-  lock_release(&filesys_lock);
+  lock_release(&file_lock);
   return length;
 }
 
@@ -295,15 +275,15 @@ int read (int fd, void *buffer, unsigned size)
     }
 
   // Read from file
-  lock_acquire(&filesys_lock);
-  struct file *f = process_get_file(fd);
+  lock_acquire(&file_lock);
+  struct file *f = find_file(fd);
   if (!f)
     {
-      lock_release(&filesys_lock);
+      lock_release(&file_lock);
       return ERROR;
     }
   int bytes = file_read(f, buffer, size);
-  lock_release(&filesys_lock);
+  lock_release(&file_lock);
   return bytes;
 }
 
@@ -317,48 +297,48 @@ int write (int fd, const void *buffer, unsigned size)
     }
 
   // Write to file
-  lock_acquire(&filesys_lock);
-  struct file *f = process_get_file(fd);
+  lock_acquire(&file_lock);
+  struct file *f = find_file(fd);
   if (!f)
     {
-      lock_release(&filesys_lock);
+      lock_release(&file_lock);
       return ERROR;
     }
   int bytes = file_write(f, buffer, size);
-  lock_release(&filesys_lock);
+  lock_release(&file_lock);
   return bytes;
 }
 
 void seek (int fd, unsigned position)
 {
-  lock_acquire(&filesys_lock);
-  struct file *f = process_get_file(fd);
+  lock_acquire(&file_lock);
+  struct file *f = find_file(fd);
   if (!f)
     {
-      lock_release(&filesys_lock);
+      lock_release(&file_lock);
       return;
     }
   file_seek(f, position);
-  lock_release(&filesys_lock);
+  lock_release(&file_lock);
 }
 
 unsigned tell (int fd)
 {
-  lock_acquire(&filesys_lock);
-  struct file *f = process_get_file(fd);
+  lock_acquire(&file_lock);
+  struct file *f = find_file(fd);
   if (!f)
     {
-      lock_release(&filesys_lock);
+      lock_release(&file_lock);
       return ERROR;
     }
   off_t offset = file_tell(f);
-  lock_release(&filesys_lock);
+  lock_release(&file_lock);
   return offset;
 }
 
 void close (int fd)
 {
-  lock_acquire(&filesys_lock);
+  lock_acquire(&file_lock);
   
   // Remove this file from file list of current thread and free its space
   struct thread *cur = thread_current ();
@@ -377,10 +357,10 @@ void close (int fd)
     }
   }
 
-  lock_release(&filesys_lock);
+  lock_release(&file_lock);
 }
 
-int user_to_kernel_ptr(const void *vaddr)
+int user_to_kernel(const void *vaddr)
 {
   // Check if vaddr is in the range of user memory
   if (!is_user_vaddr (vaddr) || vaddr < USER_BOTTOM)
@@ -397,7 +377,7 @@ int user_to_kernel_ptr(const void *vaddr)
   return (int) ptr;
 }
 
-struct file* process_get_file (int fd)
+struct file* find_file(int fd)
 {
   struct thread *t = thread_current();
   struct list_elem *e;
@@ -414,7 +394,7 @@ struct file* process_get_file (int fd)
   return NULL;
 }
 
-struct child_process* get_child_process (int pid)
+struct child_process* get_child(int pid)
 {
   struct thread *t = thread_current();
   struct list_elem *e;
@@ -431,26 +411,13 @@ struct child_process* get_child_process (int pid)
   return NULL;
 }
 
-void parse_args (struct intr_frame *f, int *arg, int n)
-{
-  // Assign arg using the values that esp points to
-  int i;
-  int *ptr;
-  for (i = 0; i < n; i++)
-    {
-      ptr = (int *) f->esp + i + 1;
-      user_to_kernel_ptr((const void *) ptr);
-      arg[i] = *ptr;
-    }
-}
-
 void check_valid_buffer (void* buffer, unsigned size)
 {
   // Check if every byte's address is valid
-  int i;
+  unsigned i;
   char* local_buffer = (char *) buffer;
   for (i = 0; i < size; i++)
     {
-      user_to_kernel_ptr((const void *) local_buffer++);
+      user_to_kernel((const void *) local_buffer++);
     }
 }

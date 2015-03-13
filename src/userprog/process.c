@@ -103,7 +103,7 @@ start_process (void *file_name_)
 int
 process_wait (tid_t child_tid UNUSED) 
 {
-  struct child_process* cp = get_child_process(child_tid);
+  struct child_process* cp = get_child(child_tid);
   if (!cp || cp->wait)
     {
       return ERROR;
@@ -153,10 +153,10 @@ process_exit (void)
   // close the executable file
   if (cur->file != NULL)
   {  
-    lock_acquire (&filesys_lock);
+    lock_acquire (&file_lock);
     file_allow_write (cur->file); 
     file_close (cur->file);
-    lock_release (&filesys_lock);
+    lock_release (&file_lock);
   }
 
   // Set exit value to true in case killed by the kernel
@@ -292,13 +292,13 @@ load (const char *file_name, void (**eip) (void), void **esp,
   process_activate ();
 
   /* Open executable file. */
-  lock_acquire(&filesys_lock);
+  lock_acquire(&file_lock);
   file = filesys_open (file_name);
  
   if (file == NULL) 
     {
       printf ("load: %s: open failed\n", file_name);
-      lock_release(&filesys_lock);
+      lock_release(&file_lock);
       goto done; 
     }
 
@@ -308,7 +308,7 @@ load (const char *file_name, void (**eip) (void), void **esp,
       t->file = file;
       // Set executable as rejective to write in 
       file_deny_write(t->file);
-      lock_release(&filesys_lock);
+      lock_release(&file_lock);
     }
 
   /* Read and verify executable header. */

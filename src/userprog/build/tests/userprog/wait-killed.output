@@ -1,13 +1,13 @@
 Copying tests/userprog/wait-killed to scratch partition...
 Copying tests/userprog/child-bad to scratch partition...
-qemu -hda /tmp/VEuDTbO_Qj.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/bieeoROKXp.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run wait-killed
 Pintos booting with 4,088 kB RAM...
 382 pages available in kernel pool.
 382 pages available in user pool.
-Calibrating timer...  it should run before loopthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluit should run after loop!157,081,600 loops/s.
+Calibrating timer...  it should run before loopthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluthe number is lluit should run after loop!52,377,600 loops/s.
 hda: 5,040 sectors (2 MB), model "QM00001", serial "QEMU HARDDISK"
 hda1: 184 sectors (92 kB), Pintos OS kernel (20)
 hda2: 4,096 sectors (2 MB), Pintos file system (21)
@@ -28,11 +28,11 @@ child-bad: exit(-1)
 (wait-killed) end
 wait-killed: exit(0)
 Execution of 'wait-killed' complete.
-Timer: 79 ticks
-Thread: 46 idle ticks, 32 kernel ticks, 1 user ticks
+Timer: 99 ticks
+Thread: 48 idle ticks, 46 kernel ticks, 5 user ticks
 hda2 (filesys): 126 reads, 366 writes
 hda3 (scratch): 179 reads, 2 writes
-Console: 1235 characters output
+Console: 1200 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

@@ -26,14 +26,17 @@ struct process_file {
   struct list_elem elem;
 };
 
-struct child_process* get_child_process (int pid);
-struct file* process_get_file (int fd);
-int user_to_kernel_ptr(const void *vaddr);
-void parse_args (struct intr_frame *f, int *arg, int n);
+struct child_process* get_child (int pid);
+struct file* find_file(int fd);
+int user_to_kernel(const void *vaddr);
 void check_valid_buffer (void* buffer, unsigned size);
-
+void check_args_1_0(struct intr_frame *f, int* arg);
+void check_args_2_0(struct intr_frame *f, int* arg);
+void check_args_1_1(struct intr_frame *f, int* arg);
+void check_args_2_1(struct intr_frame *f, int* arg);
+void check_args_3_1(struct intr_frame *f, int* arg);
 void syscall_init (void);
 
-struct lock filesys_lock;
+struct lock file_lock;
 
 #endif /* userprog/syscall.h */

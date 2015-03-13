@@ -1,6 +1,6 @@
 Copying tests/userprog/open-twice to scratch partition...
 Copying ../../tests/userprog/sample.txt to scratch partition...
-qemu -hda /tmp/IhiyTQfDhT.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/BW7QOmYlho.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run open-twice
@@ -27,8 +27,8 @@ Executing 'open-twice':
 (open-twice) end
 open-twice: exit(0)
 Execution of 'open-twice' complete.
-Timer: 68 ticks
-Thread: 36 idle ticks, 30 kernel ticks, 2 user ticks
+Timer: 72 ticks
+Thread: 39 idle ticks, 30 kernel ticks, 3 user ticks
 hda2 (filesys): 103 reads, 194 writes
 hda3 (scratch): 93 reads, 2 writes
 Console: 1230 characters output

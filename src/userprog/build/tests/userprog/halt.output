@@ -1,5 +1,5 @@
 Copying tests/userprog/halt to scratch partition...
-qemu -hda /tmp/E4piaKNTcJ.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/kXJAk5lXQN.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading...........
 Kernel command line: -q -f extract run halt
@@ -21,7 +21,7 @@ Erasing ustar archive...
 Executing 'halt':
 (halt) begin
 Timer: 66 ticks
-Thread: 37 idle ticks, 28 kernel ticks, 1 user ticks
+Thread: 32 idle ticks, 32 kernel ticks, 2 user ticks
 hda2 (filesys): 63 reads, 186 writes
 hda3 (scratch): 90 reads, 2 writes
 Console: 1014 characters output
