@@ -36,92 +36,157 @@ syscall_handler (struct intr_frame *f UNUSED)
     {
     case SYS_HALT:
       {
-	halt(); 
+	shutdown_power_off();
 	break;
       }
     case SYS_EXIT:
       {
-	parse_args (f, &arg[0], 1);
+	//parse_args (f, &arg[0], 1);
+        check_args_1_0(f, arg);
 	exit(arg[0]);
 	break;
       }
     case SYS_EXEC:
       {
-	parse_args (f, &arg[0], 1);
-	arg[0] = user_to_kernel_ptr((const void *) arg[0]);
+	check_args_1_1(f, arg);
 	f->eax = exec((const char *) arg[0]); 
 	break;
       }
     case SYS_WAIT:
       {
-	parse_args (f, &arg[0], 1);
-	f->eax = wait(arg[0]);
+	//parse_args (f, &arg[0], 1);
+        check_args_1_0(f, arg);
+	f->eax = process_wait(arg[0]);
 	break;
       }
     case SYS_CREATE:
       {
-	parse_args (f, &arg[0], 2);
-	arg[0] = user_to_kernel_ptr((const void *) arg[0]);
+	//parse_args (f, &arg[0], 2);
+	//arg[0] = user_to_kernel_ptr((const void *) arg[0]);
+        check_args_2_1(f, arg);
 	f->eax = create((const char *)arg[0], (unsigned) arg[1]);
 	break;
       }
     case SYS_REMOVE:
       {
-	parse_args(f, &arg[0], 1);
-	arg[0] = user_to_kernel_ptr((const void *) arg[0]);
+	//parse_args(f, &arg[0], 1);
+	//arg[0] = user_to_kernel_ptr((const void *) arg[0]);
+        check_args_1_1(f, arg);
 	f->eax = remove((const char *) arg[0]);
 	break;
       }
     case SYS_OPEN:
       {
-	parse_args(f, &arg[0], 1);
-	arg[0] = user_to_kernel_ptr((const void *) arg[0]);
+	//parse_args(f, &arg[0], 1);
+	//arg[0] = user_to_kernel_ptr((const void *) arg[0]);
+        check_args_1_1(f,arg);
 	f->eax = open((const char *) arg[0]);
 	break; 		
       }
     case SYS_FILESIZE:
       {
-	parse_args(f, &arg[0], 1);
+	//parse_args(f, &arg[0], 1);
+        check_args_1_0(f,arg);
 	f->eax = filesize(arg[0]);
 	break;
       }
     case SYS_READ:
       {
-	parse_args(f, &arg[0], 3);
+/*	parse_args(f, &arg[0], 3);
 	check_valid_buffer((void *) arg[1], (unsigned) arg[2]);
 	arg[1] = user_to_kernel_ptr((const void *) arg[1]);
+*/
+        check_args_3_1(f, arg);
 	f->eax = read(arg[0], (void *) arg[1], (unsigned) arg[2]);
 	break;
+
       }
     case SYS_WRITE:
       { 
-	parse_args(f, &arg[0], 3);
+/*	parse_args(f, &arg[0], 3);
 	check_valid_buffer((void *) arg[1], (unsigned) arg[2]);
 	arg[1] = user_to_kernel_ptr((const void *) arg[1]);
+*/
+        check_args_3_1(f, arg);
 	f->eax = write(arg[0], (const void *) arg[1],
 		       (unsigned) arg[2]);
 	break;
       }
     case SYS_SEEK:
       {
-	parse_args(f, &arg[0], 2);
+	//parse_args(f, &arg[0], 2);
+        check_args_2_0(f, arg);
 	seek(arg[0], (unsigned) arg[1]);
 	break;
       } 
     case SYS_TELL:
       { 
-	parse_args(f, &arg[0], 1);
+	//parse_args(f, &arg[0], 1);
+        check_args_1_0(f, arg);
 	f->eax = tell(arg[0]);
 	break;
       }
     case SYS_CLOSE:
       { 
-	parse_args(f, &arg[0], 1);
+	//parse_args(f, &arg[0], 1);
+        check_args_1_0(f, arg);
 	close(arg[0]);
 	break;
       }
     }
 }
+
+void check_args_1_0 (struct intr_frame *f, int* arg)
+{
+   int *ptr = (int *) f->esp +1;
+   user_to_kernel_ptr((const void *) ptr);
+   arg[0] = *ptr;
+}
+
+void check_args_2_0 (struct intr_frame *f, int* arg)
+{
+   int *ptr = (int *) f->esp +1;
+   int *ptr2 = (int *) f->esp +2;
+   user_to_kernel_ptr((const void *) ptr);
+   user_to_kernel_ptr((const void *) ptr2);
+   arg[0] = *ptr;
+   arg[1] = *ptr2;
+}
+
+void check_args_1_1 (struct intr_frame *f, int* arg)
+{
+   int *ptr = (int *) f->esp +1;
+   user_to_kernel_ptr((const void *) ptr);
+   arg[0] = *ptr;
+   arg[0] = user_to_kernel_ptr((const void *) arg[0]);
+}
+
+void check_args_2_1 (struct intr_frame *f, int* arg)
+{
+   int *ptr = (int *) f->esp +1;
+   int *ptr2 = (int *) f->esp +2;
+   user_to_kernel_ptr((const void *) ptr);
+   user_to_kernel_ptr((const void *) ptr2);
+   arg[0] = *ptr;
+   arg[1] = *ptr2;
+   arg[0] = user_to_kernel_ptr((const void *) arg[0]);
+}
+
+void check_args_3_1  (struct intr_frame *f, int* arg)
+{
+   int *ptr = (int *) f->esp +1;
+   int *ptr2 = (int *) f->esp +2;
+   int *ptr3 = (int *) f->esp +3;
+   user_to_kernel_ptr((const void *) ptr);
+   user_to_kernel_ptr((const void *) ptr2);
+   user_to_kernel_ptr((const void *) ptr3);
+   arg[0] = *ptr;
+   arg[1] = *ptr2;
+   arg[2] = *ptr3;
+   check_valid_buffer((void *) arg[1], (unsigned) arg[2]);
+   arg[1] = user_to_kernel_ptr((const void *) arg[1]);
+}
+
 
 void halt (void)
 {

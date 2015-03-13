@@ -541,6 +541,7 @@ setup_stack (void **esp, const char* file_name, char** save_ptr)
       *esp -= strlen(token) + 1;
       argv[argc] = *esp;
       argc++;
+      if(argc > 64) thread_exit();
       // Resize argv
       memcpy(*esp, token, strlen(token) + 1);
     }
